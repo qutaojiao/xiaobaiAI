@@ -1,4 +1,10 @@
 # xiaobaiAI
+<img width="1507" alt="image" src="https://github.com/qutaojiao/xiaobaiAI/assets/19362820/9dff3357-614b-46d6-b48a-6293fa0c063e">
+<img width="1509" alt="image" src="https://github.com/qutaojiao/xiaobaiAI/assets/19362820/adcb59e7-d43f-4b98-9c40-a9e86402b980">
+<img width="1510" alt="image" src="https://github.com/qutaojiao/xiaobaiAI/assets/19362820/22c24f17-113b-4326-a006-b132d5aaa506">
+<img width="1508" alt="image" src="https://github.com/qutaojiao/xiaobaiAI/assets/19362820/ffe9d21b-9bac-484f-9150-1211df56a5cb">
+<img width="560" alt="image" src="https://github.com/qutaojiao/xiaobaiAI/assets/19362820/46595c69-4226-447d-ad16-bf7349abeb92">
+
 
 小白AI是一个拥有Markdown编辑器的AI工具，支持潘多拉Pandora自搭建的环境，OpenAI官方，讯飞星火，清华智谱，Google Gemini，SuperAGI，自定义等多种接口接入方式。
 
