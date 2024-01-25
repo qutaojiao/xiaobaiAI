@@ -41,3 +41,45 @@ docker-compose up -d
 ```
 
 **访问地址：** 127.0.0.1:8001
+
+
+--------------------------------------------------
+
+# xiaobaiAI
+
+xiaobaiAI is an AI tool with a built-in Markdown editor that supports various integration methods, including self-built environments like Pandora, official OpenAI, Xunfei Starfire, Tsinghua Zhipu, Google Gemini, SuperAGI, and custom interfaces.
+
+## Features Supported:
+1. Supports uploading document files (doc, pdf, ppt, txt) for vector similarity queries, analyzed and processed using large models.
+2. Supports image generation and image recognition (based on large model interfaces, not local).
+3. Supports custom roles and contextual messages.
+4. All data storage is in the local browser database.
+
+## Features to be Improved:
+1. Convert editor content to PDF for download.
+2. Publishing interfaces, mainly for WordPress.
+3. UI optimization.
+4. History record modifications to be improved.
+5. Configuration interface to be optimized.
+
+**Experience Address:** To be deployed on the cloud.
+
+# Deployment Methods:
+
+## Local Deployment (In Progress)
+```bash
+git clone https://github.com/qutaojiao/xiaobaiAI
+cd xiaobaiAI
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8001
+```
+
+## Docker Deployment
+```bash
+docker-compose up -d
+```
+
+**Access Address:** 127.0.0.1:8001
+
