@@ -25,7 +25,7 @@
 
 # 部署方式：
 
-## 本地部署（推进）
+## 本地部署（推荐）
 ```bash
 git clone https://github.com/qutaojiao/xiaobaiAI
 cd xiaobaiAI
@@ -66,7 +66,7 @@ xiaobaiAI is an AI tool with a built-in Markdown editor that supports various in
 
 # Deployment Methods:
 
-## Local Deployment (In Progress)
+## Local Deployment (Recommend)
 ```bash
 git clone https://github.com/qutaojiao/xiaobaiAI
 cd xiaobaiAI
