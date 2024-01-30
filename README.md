@@ -55,7 +55,7 @@ docker-compose up -d
 xiaobaiAI is an AI tool with a built-in Markdown editor that supports various integration methods, including self-built environments like Pandora, official OpenAI, Xunfei Starfire, Tsinghua Zhipu, Google Gemini, SuperAGI, and custom interfaces.
 
 ## Features Supported:
-1. Supports uploading document files (doc, pdf, ppt, txt) for vector similarity queries, analyzed and processed using large models.
+1. Support uploading doc, pdf, ppt, txt and other document files for vector similarity query, and analyze and process them through a large model (purely local, uploaded files are also processed locally and will not be uploaded to the cloud).
 2. Supports image generation and image recognition (based on large model interfaces, not local).
 3. Supports custom roles and contextual messages.
 4. All data storage is in the local browser database.
