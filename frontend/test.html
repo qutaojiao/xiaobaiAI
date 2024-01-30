@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <script src="./js/jquery-3.6.0.min.js"></script>
+  <script type="module" src="./js/bootstrap/js/bootstrap.bundle.js"></script>
+  <title>表单页面</title>
+</head>
+<body>
+
+<div class="container mt-5">
+  <form id="mainForm">
+    <div class="form-group">
+      <label for="interfaceType">接口名称</label>
+      <input type="text" class="form-control" id="interfaceName" placeholder="输入接口名称">
+    </div>
+    <div class="form-group">
+      <label for="interfaceType">接口类型</label>
+      <input type="text" class="form-control" id="interfaceType" placeholder="输入接口类型">
+    </div>
+    <div class="form-group">
+      <label for="modelName">模型名称</label>
+      <input type="text" class="form-control" id="modelName" placeholder="输入模型名称">
+    </div>
+    <div class="form-group">
+      <label for="interfaceAddress">接口地址</label>
+      <input type="text" class="form-control" id="interfaceAddress" placeholder="输入接口地址">
+    </div>
+    <div class="form-group">
+      <label for="token">Token</label>
+      <input type="text" class="form-control" id="token" placeholder="输入Token">
+    </div>
+    
+    <div class="form-group" id="customFields">
+      <!-- 自定义表单将会动态添加到这里 -->
+    </div>
+    
+    <div class="form-group">
+      <button type="button" class="btn btn-outline-secondary" id="addCustomFieldBtn">+</button>
+    </div>
+    
+    <button type="button" class="btn btn-primary" id="submitFormBtn">提交</button>
+  </form>
+    
+</div>
+
+  <!-- Dexie.js 数据库操作 -->
+  <script src="./js/dexie.min.js"></script>
+
+<script>
+
+// 建立数据库
+const db = new Dexie("aiSugarDatabase");
+db.version(1).stores({
+  sessions: '++id, name',
+  config: 'sessionId, savedConfig',
+  gptConfigData: '++id, formData',  // 新增用于存储表单数据的表
+  converseConfig: 'sessionId, converseConfig',
+  conversationHistory: 'sessionId, messagesHistory',
+  sessionContents: 'sessionId, fullContent'
+});
+
+
+  $(document).ready(function () {
+    // 使用 on('click') 替代 onclick
+    $('#addCustomFieldBtn').on('click', function () {
+      addCustomField();
+    });
+
+    $('#submitFormBtn').on('click', function () {
+      submitForm();
+    });
+  });
+
+
+
+  // 在文档加载完成后打开Dexie数据库
+  db.open().catch(function (error) {
+    console.error('打开数据库时出错：', error);
+  });
+
+// 通用数据插入数据库函数
+function insertFormData(formData) {
+  db.gptConfigData.add({ formData: formData }).then(id => {
+    console.log('表单数据已成功插入数据库，生成的主键（sessionId）为:', id);
+  }).catch(error => {
+    console.error('插入数据时出现错误：', error);
+  });
+}
+
+  function addCustomField() {
+    // 获取表单名称、表单字段、表单值
+    var fieldName = prompt("输入表单名称:");
+    var fieldKey = prompt("输入表单字段:");
+    var fieldValue = prompt("输入表单值:");
+    
+    // 创建新的自定义表单组
+    var customFormGroup = $('<div class="form-group"></div>');
+    
+    // 创建标签元素并设置内容
+    var label = $('<label class="col-form-label">' + fieldName + '</label>');
+    
+    // 创建表单行元素
+    var formRow = $('<div class="form-row"></div>');
+    
+    // 创建输入框元素并设置属性,需要表单提示
+    var keyInput = $('<input type="text" class="form-control col-sm-3" value="' + fieldKey + '" placeholder="字段,纯英文">');
+    var valueInput = $('<input type="text" class="form-control col-sm" value="' + fieldValue + '" placeholder="字段值">');
+    
+    // 创建删除按钮
+    var delButton = $('<button type="button" class="btn btn-outline-secondary" onclick="delCustomField(this)">-</button>');
+    
+    // 将输入框和删除按钮添加到表单行元素中
+    formRow.append(keyInput);
+    formRow.append(valueInput);
+    formRow.append(delButton);
+    
+    // 将标签和表单行添加到自定义表单组中
+    customFormGroup.append(label);
+    customFormGroup.append(formRow);
+    
+    // 获取自定义表单容器
+    var customFieldsContainer = $('#customFields');
+    
+    // 将新的自定义表单组插入到自定义表单容器中
+    customFieldsContainer.append(customFormGroup);
+  }
+
+  function delCustomField(button) {
+    // 获取要删除的自定义表单组
+    var customFormGroup = $(button).closest('.form-group');
+    
+    // 删除自定义表单组
+    customFormGroup.remove();
+  }
+
+  // 修改submitForm函数，添加插入数据库的操作
+// 修改 submitForm 函数
+function submitForm() {
+  // 获取所有表单字段和值
+  var formData = {};
+
+  // 处理默认表单字段
+  $('#mainForm .form-group').each(function () {
+    var labelName = $(this).find('label').text();
+    var inputId = $(this).find(':input').attr('id');
+    var inputValue = $(this).find(':input').val();
+
+    // 排除空 labelName
+    if (labelName.trim() !== "") {
+      formData[labelName] = {
+        "inputId": inputId,
+        "key": inputId,
+        "value": inputValue
+      };
+    }
+  });
+
+  // 处理自定义表单字段
+  $('#customFields .form-group').each(function (index) {
+    var fieldName = $(this).find('.col-form-label').text();
+    var fieldKey = $(this).find('.col-sm-3').val();
+    var fieldValue = $(this).find('.col-sm').val();
+
+    formData[fieldName] = {
+      "inputId": fieldKey,
+      "key": fieldKey,
+      "value": fieldValue
+    };
+  });
+
+  // 将 JSON 数据打印在控制台
+  console.log(JSON.stringify(formData, null, 2));
+
+  // 插入数据库
+  insertFormData(formData);
+}
+
+</script>
+
+</body>
+</html>

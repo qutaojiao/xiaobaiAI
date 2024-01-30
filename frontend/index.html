@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Document Processing Assistant</title>
+
+  <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./css/bootstrap/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="./css/bootstrap/css/bootstrap-icons.css"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.11.0/font/bootstrap-icons.css" rel="stylesheet"> -->
+  <!-- 在 head 部分添加 -->
+  <!-- <link rel="stylesheet" href="./css/editormd.min.css" /> -->
+  <!-- 引入 CSS -->
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.css" rel="stylesheet">
+  <link href="https://cdn.bootcdn.net/ajax/libs/tui-editor/1.4.9/tui-editor.css" rel="stylesheet">
+  <link href="https://cdn.bootcdn.net/ajax/libs/tui-editor/1.4.9/tui-editor-contents.css" rel="stylesheet"> -->
+  <!-- 编辑器 -->
+  <link rel="stylesheet" href="./js/tuieditor/cdn/toastui-editor.css" />
+  <!-- 编辑器插件 -->
+  <link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css"/>
+  <link rel="stylesheet" href="./js/tuieditor/plugins/code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css">
+  <link rel="stylesheet" href="./js/tuieditor/plugins/color-syntax/dist/toastui-editor-plugin-color-syntax.css" />
+  <link rel="stylesheet" href="./js/tuieditor/plugins/table-merged-cell/dist/toastui-editor-plugin-table-merged-cell.css" />
+
+  
+
+
+  <!-- <link rel="stylesheet" href="https://majestic.bootmb.com/vendors/mdi/css/materialdesignicons.min.css"> -->
+  <!-- <link rel="stylesheet" href="./css/style2.css"> -->
+
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- google Gemini -->
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "/js/generative-ai-esm.js"
+      }
+    }
+  </script>
+
+
+
+  <!-- mermaid流程图 -->
+  <script src="./js/mermaid.min.js"></script>
+
+
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      <div class="left-menu col custom-col1 p-0 pt-3">
+        <!-- 第一列：LOGO+导航 -->
+        <div class="col custom-col1 d-flex flex-column align-items-center">
+          <!-- Logo -->
+          <svg t="1703776010678" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="31135" width="35" height="35">
+            <path
+              d="M401.371429 1024c-27.771429 0-53.714286-14.057143-68.914286-37.371429C274.285714 972.571429 232.114286 945.142857 203.428571 902.971429c-30.4-44.8-45.942857-105.942857-49.028571-192.571429-0.457143-12.342857-1.257143-25.6-2.514286-40.685714-31.657143-17.142857-57.371429-45.828571-71.771428-81.028572-10.742857-25.828571-14.514286-54.171429-10.857143-81.942857-14.514286-15.085714-25.942857-32.685714-33.828572-52-17.6-42.742857-16.228571-88.914286 2.628572-126.514286-13.371429-42.171429-11.657143-86.971429 4.914286-125.257142 16.457143-37.828571 46.057143-66.285714 83.428571-80.342858 13.6-5.142857 28-8.228571 42.514286-9.142857 21.257143-22.057143 53.371429-36.342857 91.885714-40.457143 38.057143-30.857143 85.6-47.542857 134.514286-47.428571 11.085714 0 22.171429 0.8 33.142857 2.514286 65.828571-37.485714 146.4-37.485714 212.228571 0 70.742857-10.971429 142.4 14.057143 190.857143 66.742857 8.685714 5.142857 16.685714 11.542857 23.657143 18.742857 14.628571 0.914286 28.914286 4 42.628571 9.142857 37.371429 14.057143 66.971429 42.628571 83.428572 80.342857 16.685714 38.285714 18.285714 83.2 4.914286 125.257143 18.857143 37.6 20.228571 83.771429 2.628571 126.514286-7.885714 19.314286-19.428571 37.028571-33.942857 52 3.542857 27.771429-0.114286 56-10.857143 81.828571-14.4 35.2-40.228571 63.885714-71.771429 81.028572-1.257143 15.085714-2.057143 28.342857-2.514285 40.685714-3.085714 86.628571-18.628571 147.771429-49.028572 192.571429-28.571429 42.171429-70.857143 69.6-129.028571 83.657142-15.2 23.314286-41.028571 37.371429-68.914286 37.371429H401.371429z"
+              fill="#25467A" p-id="31136"></path>
+            <path
+              d="M401.371429 893.485714h221.371428c19.542857 0 35.314286 15.771429 35.314286 35.314286v13.028571c0 19.542857-15.771429 35.314286-35.314286 35.314286H401.371429c-19.542857 0-35.314286-15.771429-35.314286-35.314286v-13.028571c0-19.428571 15.771429-35.314286 35.314286-35.314286z"
+              fill="#FDEFBA" p-id="31137"></path>
+            <path
+              d="M673.714286 72.457143c-14.285714 0-28.457143 1.828571-42.285715 5.371428-58.057143-41.257143-135.771429-41.257143-193.828571 0-89.371429-23.314286-180.8 30.171429-204.228571 119.542858S263.542857 378.285714 353.028571 401.6c47.885714 12.457143 98.857143 3.2 139.2-25.485714 27.771429 7.2 56.914286 7.2 84.685715 0 75.314286 53.485714 179.771429 35.885714 233.257143-39.542857s35.885714-179.771429-39.542858-233.257143c-28.342857-20.114286-62.171429-30.857143-96.914285-30.857143z"
+              fill="#689F38" p-id="31138"></path>
+            <path
+              d="M750.4 423.428571c-15.771429-22.742857-37.485714-39.085714-60.457143-47.771428 19.428571-31.542857 10.628571-78.857143-24.571428-115.885714-29.828571-31.314286-70.742857-46.628571-105.142858-42.742858-10.514286-19.542857-28.228571-38.285714-52-52.914285-41.6-25.6-89.371429-31.085714-121.6-16.8-18.057143-11.428571-40.457143-20.457143-65.142857-25.142857-60.228571-11.657143-114.285714 5.485714-129.257143 38.857142-16.685714-2.285714-33.714286-0.457143-49.485714 5.485715-58.057143 21.828571-83.085714 93.028571-56 159.085714 1.028571 2.628571 2.171429 5.142857 3.428572 7.657143-21.371429 26.171429-27.085714 65.942857-11.542858 103.657143 8.685714 21.6 23.771429 40 43.085715 52.914285-9.6 23.885714-9.828571 53.028571 1.714285 81.028572 21.828571 52.914286 77.257143 81.714286 123.885715 64.228571s66.742857-74.628571 44.914285-127.657143c-8.8-21.6-23.771429-40-43.085714-52.914285 6.857143-17.485714 8.8-36.571429 5.6-55.085715 41.485714-23.314286 61.371429-74.514286 50.4-126.971428 28.457143 4.685714 55.2 2.971429 76.8-3.885714 9.257143 9.485714 19.657143 17.828571 30.971429 24.685714 29.371429 18.057143 61.714286 26.171429 89.6 24.228571 6.285714 17.6 16.228571 33.6 29.257143 46.971429 16.114286 17.028571 36.114286 29.828571 58.285714 37.257143-18.857143 29.257143-16.457143 72.457143 9.371428 109.6 33.828571 48.685714 95.085714 68.457143 136.685715 44.114285s48.114286-83.314286 14.285714-132z"
+              fill="#AED581" p-id="31139"></path>
+            <path
+              d="M799.771429 700.8c10.4 126.057143 5.714286 253.257143-232.457143 253.257143S210.171429 958.857143 201.257143 708.8c-6.971429-197.371429-102.171429-470.057143 136-470.057143s446.171429 263.428571 462.514286 462.057143z"
+              fill="#FFFDE7" p-id="31140"></path>
+            <path
+              d="M933.828571 333.257143c1.142857-2.514286 2.285714-5.028571 3.428572-7.657143 27.2-66.057143 2.057143-137.257143-56-159.085714-15.771429-5.828571-32.8-7.771429-49.485714-5.371429-14.971429-33.257143-69.028571-50.4-129.257143-38.857143-24.685714 4.8-47.085714 13.714286-65.142857 25.142857-32.228571-14.285714-80-8.914286-121.6 16.8-23.657143 14.628571-41.485714 33.371429-52 52.914286-34.4-4-75.2 11.428571-105.028572 42.742857-20.571429 21.6-32.114286 46.742857-34.285714 70.171429-25.142857 7.771429-49.485714 25.028571-66.742857 49.828571-19.885714 28.571429-25.828571 60.685714-19.085715 87.314286-18.971429 17.6-32.228571 40.457143-38.171428 65.6-13.942857 57.6 13.485714 110.514286 61.028571 118.057143s97.485714-33.028571 111.428572-90.628572c4.914286-20.342857 352.571429-47.2 357.257143-48.457142-19.085714 51.771429 1.142857 106.4 46.514285 123.428571 46.628571 17.485714 102.057143-11.2 123.885715-64.228571 11.542857-28 11.314286-57.142857 1.714285-81.028572 19.314286-12.914286 34.285714-31.428571 43.085715-52.914286 15.542857-37.828571 9.828571-77.6-11.542858-103.771428z"
+              fill="#9CCC65" p-id="31141"></path>
+            <path
+              d="M224.228571 700.8c-10.4 126.057143-5.828571 253.257143 232.457143 253.257143s357.257143 4.8 366.057143-245.257143c7.085714-197.371429 44.685714-342.742857-193.485714-342.742857s-388.571429 136.114286-405.028572 334.742857z"
+              fill="#FFFEF8" p-id="31142"></path>
+            <path
+              d="M512 827.657143c-38.171429 0-69.142857-30.971429-69.142857-69.257143 0-7.657143 6.171429-13.828571 13.828571-13.942857 7.314286 0 13.485714 5.714286 13.828572 13.028571v0.8c0.342857 22.971429 19.314286 41.257143 42.171428 40.8 22.4-0.342857 40.457143-18.4 40.8-40.8-0.228571-7.657143 5.828571-14.057143 13.371429-14.285714 7.657143-0.228571 14.057143 5.828571 14.285714 13.371429v0.8c0 38.4-30.971429 69.371429-69.142857 69.485714zM332.114286 647.771429c0.342857 22.971429 19.314286 41.257143 42.171428 40.8 22.4-0.342857 40.457143-18.4 40.8-40.8-0.342857-22.971429-19.314286-41.257143-42.171428-40.8-22.4 0.342857-40.457143 18.4-40.8 40.8zM608.8 647.771429c-0.342857 22.971429 17.828571 41.828571 40.8 42.285714 22.971429 0.342857 41.828571-17.828571 42.285714-40.8v-1.485714c-0.342857-22.971429-19.314286-41.257143-42.171428-40.8-22.4 0.342857-40.457143 18.4-40.914286 40.8z"
+              fill="#25467A" p-id="31143"></path>
+            <path
+              d="M318.285714 716.914286h-55.314285c-15.314286 0.342857-27.428571 12.914286-27.085715 28.228571 0.342857 14.857143 12.228571 26.857143 27.085715 27.085714h55.428571c15.314286 0.342857 27.885714-11.771429 28.228571-27.085714 0.342857-15.314286-11.771429-27.885714-27.085714-28.228571h-1.257143z m442.742857 0h-55.314285c-15.314286 0.342857-27.428571 12.914286-27.085715 28.228571 0.342857 14.857143 12.228571 26.857143 27.085715 27.085714h55.314285c15.314286-0.342857 27.428571-12.914286 27.085715-28.228571-0.228571-14.857143-12.228571-26.742857-27.085715-27.085714z"
+              fill="#AED581" p-id="31144"></path>
+          </svg>
+
+          <!-- 导航按钮 -->
+          <div class="nav flex-column nav-pills mt-4" id="nav-menu-tab" role="tablist" aria-orientation="vertical">
+            <div class="btn btn-icon mt-2 mb-2 p-1 active" id="v-pills-home-tab" data-toggle="pill" data-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">
+              <svg t="1704681353510" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="22915" width="32" height="32"><path d="M832 320h-96V288h96V192h-60.16l42.56-42.56-67.84-67.84L704 124.16V64h-96v96H192a96 96 0 0 0-96 96v516.48l38.72-32A305.92 305.92 0 0 0 400 896a302.08 302.08 0 0 0 247.68-128h83.2L928 932.48V416a96 96 0 0 0-96-96z" fill="#FFFFFF" p-id="22916"></path><path d="M400 592m-272 0a272 272 0 1 0 544 0 272 272 0 1 0-544 0Z" fill="#E9EAEB" p-id="22917"></path><path d="M896 416a64 64 0 0 0-64-64H384a64 64 0 0 0-64 64v256a64 64 0 0 0 64 64h358.4l153.6 128v-192z" fill="#FFFFFF" p-id="22918"></path><path d="M128 256a64 64 0 0 1 64-64h448a64 64 0 0 1 64 64v256a64 64 0 0 1-64 64H281.6L128 704v-192z" fill="#A3D4FF" p-id="22919"></path><path d="M832 352h-96v32h96a32 32 0 0 1 32 32v379.52l-101.12-84.16-8.96-7.36H384a32 32 0 0 1-32-32v-64h-32v64a64 64 0 0 0 64 64h358.4l153.6 128V416a64 64 0 0 0-64-64z" fill="#2A5082" p-id="22920"></path><path d="M768 512h32v32h-32zM416 608h224v32h-224zM704 608h96v32h-96z" fill="#2A5082" p-id="22921"></path><path d="M281.6 576H640a64 64 0 0 0 64-64V256a64 64 0 0 0-64-64H192a64 64 0 0 0-64 64v448zM160 256a32 32 0 0 1 32-32h448a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H270.08l-8.96 7.36L160 635.52V256z" fill="#2A5082" p-id="22922"></path><path d="M224 288h384v32H224zM384 384h224v32h-224zM224 384h96v32H224zM736 224h64v32h-64zM701.376 172.416l45.28-45.248 22.624 22.624-45.28 45.248zM640 96h32v64h-32zM224 672h64v32H224zM254.848 778.176l45.248-45.248 22.624 22.624-45.248 45.248zM352 768h32v64h-32z" fill="#2A5082" p-id="22923"></path></svg>
+            </div>
+            <div class="btn btn-icon mt-2 mb-2 p-1" id="v-pills-files-tab" data-toggle="pill" data-target="#v-pills-files" type="button" role="tab" aria-controls="v-pills-files" aria-selected="false">
+              <svg t="1704725523481" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1446" width="32" height="32"><path d="M928 400a237.76 237.76 0 0 0-64-162.88V96h-256a128 128 0 0 0-128 128 128 128 0 0 0-128-128H96v256a128 128 0 0 0 128 128 128 128 0 0 0-128 128v256h256a134.72 134.72 0 0 0 35.84-5.12A96 96 0 0 0 480 928h352a96 96 0 0 0 96-96v-288a96 96 0 0 0-17.28-54.72A235.84 235.84 0 0 0 928 400z" fill="#FFFFFF" p-id="1447"></path><path d="M688 400m-208 0a208 208 0 1 0 416 0 208 208 0 1 0-416 0Z" fill="#E9EAEB" p-id="1448"></path><path d="M448 512H224a96 96 0 0 0-96 96v224h224a96 96 0 0 0 96-96z" fill="#FFFFFF" p-id="1449"></path><path d="M128 128h224a96 96 0 0 1 96 96v224H224a96 96 0 0 1-96-96V128z" fill="#A3D4FF" p-id="1450"></path><path d="M832 128h-224a96 96 0 0 0-96 96v224h224a96 96 0 0 0 96-96z" fill="#FFFFFF" p-id="1451"></path><path d="M416 544v192a64 64 0 0 1-64 64H160v-192a64 64 0 0 1 64-64h192m32-32H224a96 96 0 0 0-96 96v224h224a96 96 0 0 0 96-96v-224zM352 160a64 64 0 0 1 64 64v192H224a64 64 0 0 1-64-64V160h192m0-32H128v224a96 96 0 0 0 96 96h224V224a96 96 0 0 0-96-96zM800 160v192a64 64 0 0 1-64 64h-192V224a64 64 0 0 1 64-64h192m32-32h-224a96 96 0 0 0-96 96v224h224a96 96 0 0 0 96-96V128z" fill="#2A5082" p-id="1452"></path><path d="M416 480m64 0l352 0q64 0 64 64l0 288q0 64-64 64l-352 0q-64 0-64-64l0-288q0-64 64-64Z" fill="#FFFFFF" p-id="1453"></path><path d="M480 480h352a64 64 0 0 1 64 64v64H416v-64a64 64 0 0 1 64-64z" fill="#A3D4FF" p-id="1454"></path><path d="M832 512a32 32 0 0 1 32 32v288a32 32 0 0 1-32 32H480a32 32 0 0 1-32-32v-288a32 32 0 0 1 32-32h352m0-32H480a64 64 0 0 0-64 64v288a64 64 0 0 0 64 64h352a64 64 0 0 0 64-64v-288a64 64 0 0 0-64-64z" fill="#2A5082" p-id="1455"></path><path d="M832 576H480v32h352v-32zM576 672h-96v32h96v-32zM832 768h-96v32h96v-32zM832 672h-224v32h224v-32z" fill="#2A5082" p-id="1456"></path><path d="M608 672v32h-32v-32h32m32-32h-96v96h96v-96zM704 768h-224v32h224v-32z" fill="#2A5082" p-id="1457"></path><path d="M736 768v32h-32v-32h32m32-32h-96v96h96v-96z" fill="#2A5082" p-id="1458"></path></svg>
+            </div>          
+          </div>
+        </div>
+
+        <div class="col custom-col1 d-flex flex-column align-items-center nav-menu-bottom-tab">
+          <div class="nav flex-column nav-pills mt-4" id="nav-menu-bottom" role="tablist" aria-orientation="vertical">
+            <div class="btn btn-icon mt-2 p-1">
+              <a href="https://github.com/qutaojiao/xiaobaiAI/" target="_blank"><svg t="1706197908195" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9850" width="25" height="25"><path d="M1024 496C1012.8 232 798.4 17.6 534.4 8 393.6 1.6 259.2 52.8 156.8 150.4 56 248 0 379.2 0 520c0 230.4 155.2 433.6 376 492.8 6.4 1.6 12.8 3.2 19.2 3.2 16 0 32-4.8 44.8-16 17.6-14.4 28.8-35.2 28.8-57.6v-52.8c0-14.4 1.6-78.4 1.6-91.2 1.6-8 3.2-14.4 8-19.2 11.2-14.4 12.8-33.6 4.8-49.6-8-14.4-20.8-24-36.8-25.6-11.2-1.6-22.4-3.2-30.4-6.4-12.8-3.2-25.6-9.6-38.4-16-9.6-4.8-19.2-12.8-27.2-22.4-6.4-8-12.8-20.8-17.6-36.8-6.4-19.2-9.6-40-9.6-62.4 0-28.8 9.6-52.8 27.2-72l17.6-19.2-9.6-24c-3.2-8-6.4-19.2-4.8-38.4 22.4 8 28.8 12.8 28.8 12.8l1.6 1.6c6.4 3.2 11.2 8 16 9.6l19.2 11.2 16-4.8c27.2-8 54.4-11.2 83.2-11.2 28.8 0 56 3.2 83.2 11.2l16 4.8 33.6-20.8c11.2-6.4 22.4-12.8 35.2-17.6 1.6 14.4 0 27.2-4.8 40l-9.6 24 17.6 19.2c17.6 19.2 27.2 43.2 27.2 72 0 24-3.2 43.2-8 60.8-6.4 19.2-12.8 30.4-19.2 38.4-6.4 8-16 16-28.8 24-14.4 8-25.6 11.2-38.4 16-8 3.2-20.8 4.8-32 6.4h-1.6c-16 3.2-28.8 14.4-35.2 28.8-6.4 14.4-4.8 30.4 4.8 44.8 6.4 8 9.6 20.8 9.6 36.8v126.4c0 22.4 11.2 44.8 28.8 57.6 17.6 12.8 41.6 17.6 64 11.2C888 942.4 1035.2 729.6 1024 496zM651.2 931.2V816c0-14.4-1.6-27.2-4.8-38.4 17.6-4.8 35.2-11.2 54.4-22.4l1.6-1.6c20.8-12.8 36.8-25.6 49.6-41.6 16-19.2 25.6-41.6 33.6-64 8-25.6 12.8-52.8 12.8-86.4 0-41.6-11.2-76.8-33.6-108.8 6.4-33.6 3.2-67.2-11.2-104l-6.4-17.6-17.6-6.4c-17.6-6.4-40-4.8-67.2 6.4-17.6 6.4-33.6 14.4-51.2 24l-3.2 3.2c-56-12.8-116.8-12.8-174.4 0-1.6-1.6-3.2-1.6-4.8-3.2-9.6-6.4-24-14.4-46.4-22.4-27.2-12.8-51.2-14.4-70.4-8l-17.6 6.4-6.4 17.6c-14.4 38.4-17.6 72-9.6 104-22.4 30.4-33.6 67.2-33.6 108.8 0 30.4 3.2 57.6 12.8 84.8 8 27.2 19.2 49.6 32 65.6 16 17.6 32 32 51.2 41.6 17.6 9.6 35.2 17.6 54.4 22.4-1.6 4.8-1.6 9.6-3.2 16V843.2c-38.4-12.8-70.4-28.8-96-56-17.6-19.2-36.8-38.4-46.4-44.8-20.8-9.6-33.6 11.2-28.8 20.8 4.8 14.4 25.6 22.4 36.8 33.6 12.8 12.8 14.4 30.4 25.6 44.8 16 22.4 72 49.6 110.4 41.6v51.2C206.4 881.6 80 712 80 520c0-118.4 46.4-228.8 132.8-312C294.4 129.6 400 88 513.6 88h17.6C753.6 96 934.4 276.8 944 499.2c9.6 193.6-110.4 369.6-292.8 432z" p-id="9851" fill="#bfbfbf"></path></svg></a>
+            </div>
+            <div class="btn btn-icon mb-2 p-1">
+              <div id="setting-default"><svg t="1706198085304" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11186" width="25" height="25"><path d="M872.554667 306.304c-22.613333 8.128-45.696 9.941333-69.162667 4.373333a119.722667 119.722667 0 0 1-85.504-158.144c1.749333-4.842667 0.853333-6.954667-3.605333-8.96-17.92-8.106667-35.541333-16.917333-53.674667-24.533333-11.925333-4.992-24.533333-8.384-36.501333-12.373333-23.146667 47.658667-59.456 74.88-112.064 74.88-52.821333 0-89.258667-27.306667-111.978667-74.538667a411.733333 411.733333 0 0 0-95.530667 39.573333c17.216 49.493333 10.922667 94.634667-26.538666 131.925334-37.376 37.205333-82.496 43.712-131.776 26.282666A413.290667 413.290667 0 0 0 106.666667 400.298667c46.933333 22.656 74.197333 58.666667 74.517333 110.997333 0.32 53.162667-26.986667 89.770667-74.538667 112.768a410.154667 410.154667 0 0 0 39.637334 95.530667c47.808-16.789333 91.669333-11.370667 128.64 23.253333 39.957333 37.44 47.274667 83.626667 29.653333 134.933333a404.949333 404.949333 0 0 0 95.530667 39.466667c23.04-47.36 59.349333-74.474667 111.978666-74.453333 52.885333 0.064 89.216 27.541333 111.893334 74.538666a411.584 411.584 0 0 0 95.488-39.616c-17.386667-49.493333-10.816-94.4 26.24-131.626666 37.290667-37.418667 82.432-43.776 132.053333-26.538667a407.637333 407.637333 0 0 0 39.509333-95.509333c-47.786667-23.210667-74.986667-59.946667-74.517333-113.066667 0.448-52.053333 27.562667-87.957333 74.56-110.656a420.394667 420.394667 0 0 0-38.016-92.970667c-2.048-3.712-4.309333-1.92-6.762667-1.066666z m85.952 82.794667a42.666667 42.666667 0 0 1-22.613334 49.642666c-34.602667 16.725333-50.176 39.146667-50.453333 72.618667-0.298667 34.282667 15.253333 57.194667 50.496 74.304a42.666667 42.666667 0 0 1 22.549333 49.536 450.304 450.304 0 0 1-43.669333 105.472 42.666667 42.666667 0 0 1-51.050667 19.178667c-36.650667-12.736-63.850667-7.68-87.808 16.362666-23.914667 24.021333-28.949333 51.093333-16.213333 87.381334a42.666667 42.666667 0 0 1-19.072 51.178666 454.229333 454.229333 0 0 1-105.344 43.690667 42.666667 42.666667 0 0 1-49.770667-22.592c-16.725333-34.688-39.509333-50.368-73.493333-50.389333-33.92-0.021333-56.597333 15.509333-73.578667 50.432a42.666667 42.666667 0 0 1-49.322666 22.570666 447.338667 447.338667 0 0 1-105.6-43.562666 42.666667 42.666667 0 0 1-19.328-50.986667c13.034667-37.973333 7.381333-65.728-18.474667-89.941333-23.594667-22.101333-50.090667-26.517333-85.333333-14.144a42.666667 42.666667 0 0 1-51.157334-19.050667 452.821333 452.821333 0 0 1-43.733333-105.450667 42.666667 42.666667 0 0 1 22.549333-49.706666c35.072-16.938667 50.666667-39.808 50.453334-74.069334-0.213333-33.642667-15.786667-56.149333-50.389334-72.853333A42.666667 42.666667 0 0 1 65.493333 389.12a455.808 455.808 0 0 1 43.541334-105.344 42.666667 42.666667 0 0 1 51.392-19.242667c36.096 12.778667 63.317333 7.722667 87.466666-16.298666 24-23.893333 29.034667-51.072 16.32-87.68a42.666667 42.666667 0 0 1 19.178667-51.050667 454.4 454.4 0 0 1 105.386667-43.669333 42.666667 42.666667 0 0 1 49.706666 22.656c16.725333 34.730667 39.509333 50.389333 73.536 50.368 33.898667 0 56.576-15.616 73.664-50.837334a42.666667 42.666667 0 0 1 51.882667-21.845333c2.517333 0.832 4.992 1.621333 9.28 2.965333l7.530667 2.346667c8.96 2.88 15.786667 5.290667 22.698666 8.192 10.154667 4.245333 18.090667 7.872 35.029334 15.829333 10.069333 4.736 14.4 6.741333 19.733333 9.152 25.024 11.306667 35.349333 36.821333 26.154667 62.336-16 44.352 9.344 91.221333 55.253333 102.144 14.805333 3.52 29.418667 2.538667 44.864-3.029333a33.28 33.28 0 0 1 4.48-1.621333c5.269333-1.621333 10.88-2.453333 17.322667-1.941334 16.853333 1.344 29.525333 11.093333 36.736 24.170667a462.890667 462.890667 0 0 1 41.813333 102.357333zM522.666667 320a202.666667 202.666667 0 1 0 166.4 86.954667 21.333333 21.333333 0 0 0-35.008 24.384 160 160 0 1 1-69.184-56.128 21.333333 21.333333 0 0 0 16.597333-39.317334A202.090667 202.090667 0 0 0 522.666667 320z" fill="#bfbfbf" p-id="11187"></path></svg></div>
+            </div>          
+          </div>
+        </div>
+
+      </div>
+      <div class="left-content col custom-col2" id="sidebar">
+        <!-- 导航内容 -->
+        <div class="tab-content" id="nav-menu-tab-content">
+          <div class="tab-pane fade show active mt-4" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+            <button id="newConversation" class="btn btn-primary mb-3"><i class="bi bi-plus"></i> 新对话</button>
+            <div class="list-group" id="conversationsList">
+                  <!-- 对话列表项将在这里动态生成 -->
+            </div>
+          </div>
+          <div class="tab-pane fade mt-4" id="v-pills-files" role="tabpanel" aria-labelledby="v-pills-files-tab">
+            <button id="uploadFile" class="btn btn-primary mb-3"><i class="bi bi-cloud-upload"></i> 上传文件</button>
+            <input type="file" id="fileInput" style="display:none;">
+            <ul class="list-group" id="filesList">
+              <!-- 这里添加上传文件的列表 -->
+              <!-- 例如：<li class="list-group-item">文件1.txt</li> -->
+            </ul>
+          </div>
+        </div>
+
+
+        <div class="function-tool mt-2">
+          <!-- <nav>
+            <div class="nav nav-tabs" id="nav-function-tab" role="tablist">
+              <button class="btn active mr-3" id="nav-function-tab" data-toggle="tab" data-target="#nav-function"
+                type="button" role="tab" aria-controls="nav-function" aria-selected="true">功能选择</button>
+              <button class="btn" id="nav-history-tab" data-toggle="tab" data-target="#nav-history" type="button"
+                role="tab" aria-controls="nav-history" aria-selected="false">历史会话</button>
+            </div>
+          </nav> -->
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-function" role="tabpanel"
+              aria-labelledby="nav-function-tab">
+              <div class="pt-3">
+                <!-- <div class="row">
+                  <div class="col-12 form-group mb-3">
+                    
+                    <select class="custom-select" id="function-selete">
+                      <option value="base" selected>基础功能</option>
+                      <option value="url">URL内容处理</option>
+                    </select>
+                  </div>
+                </div> -->
+
+                <!-- URL 内容处理区域 -->
+                <!-- <div id="editorContainer" class="row mt-2 mb-3 overflow-auto d-none">
+                  <div class="col-auto">
+                    <p class="text-gray-500 text-sm mb-2">网页抓取的源内容/待处理文本</p>
+                    <textarea class="form-control" id="editorText" rows="13"></textarea>
+                    <div class="input-group mt-2">
+                      <input type="text" class="form-control" id="urlInput" placeholder="输入网址…">
+                      <div class="input-group-append">
+                        <button id="getUrlContentBtn" class="btn btn-primary">抓取</button>
+                      </div>
+                    </div>
+                  </div>
+                </div> -->
+
+                <!-- google gemin 图片上传 -->
+                <!-- <div class="row gemini-file mb-2 d-none">
+                  <div class="col-auto">
+                    <img id="previewImage" src="#" alt="预览图"
+                      style="display:none; max-width: 100%; max-height: 200px;margin-bottom: 4px;">
+                    <div class="custom-file mb-2">
+                      <input type="file" class="custom-file-input" id="inputFile" accept="image/*">
+                      <label class="custom-file-label" for="inputFile">选择图片</label>
+                    </div>
+                  </div>
+                </div> -->
+
+                <!-- <div class="row">
+                  <div class="col-auto input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">选择角色</div>
+                    </div>
+                    <select class="form-control" id="role-select">
+                    </select>
+                  </div>
+                </div> -->
+
+                <!-- <div class="row">
+                  <div class="col-auto input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">角色设定</div>
+                    </div>
+                    <textarea class="form-control" id="roleInput" placeholder="设定角色…" rows="1">你现在承担的是内容优化专家的角色，针对杂乱的图文，需要进行图文重新排版优化，要求：必须保留原文的图片，并以markdown格式返回</textarea>
+                  </div>
+                </div> -->
+
+
+
+                <!-- <div class="row">
+                  <div class="col-auto input-group mb-3">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">文本模式</div>
+                    </div>
+                    <select class="form-control" id="continueSeparator">
+                      <option value="piece">拼接</option>
+                      <option value="break">换行</option>
+                      <option value="dash">横线</option>
+                      <option value="dialog">对话模式</option>
+                    </select>
+                  </div>
+                </div> -->
+
+                <!-- <div class="row">
+                  <div class="col-auto input-group mb-3">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">输出格式</div>
+                    </div>
+                    <select class="form-control" id="outputSeparator">
+                      <option value="none">默认无</option>
+                      <option value="task">任务列表</option>
+                      <option value="table">表格</option>
+                      <option value="flow">流程图</option>
+                      <option value="sequence">时序图</option>
+                      <option value="mindmap">思维导图</option>
+                      <option value="mermaid">mermaid模板</option>
+                    </select>
+                  </div>
+                </div> -->
+
+                <!-- <div class="row">
+                  <div class="col-auto input-group mb-3">
+                    <textarea class="form-control" id="promptInput" rows="5" placeholder="输入提示…"
+                      style="resize: none;"></textarea>
+                    <span class="input-group-text" id="charCount">0/30000</span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-auto button-group">
+                    <button id="continueBtn" class="btn btn-primary mb-2">
+                      生成
+                    </button>
+                    <button id="stopBtn" disabled class="btn btn-secondary mb-2">
+                      停止
+                    </button>
+                  </div>
+                </div> -->
+
+                <div class="row">
+                  <div class="col-auto">
+                    <!-- <button id="clearHistoryBtn" class="btn btn-warning mb-2">清空上下文消息</button> -->
+                    <!-- <button id="open-off-canvas" class="btn btn-primary mb-2">历史对话管理</button> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="nav-history" role="tabpanel" aria-labelledby="nav-history-tab">
+              <div id="sidebar" class="sidebar mt-3">
+                <!-- <button id="newConversation" class="btn btn-primary mb-3"><i class="bi bi-plus"></i> 新对话</button>
+                <div class="list-group" id="conversationsList">
+
+                </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+      </div>
+
+      <!-- 右侧 -->
+      <div class="bg-light col custom-col3 flex-grow-1 p-0" id="contentArea">
+        <!-- 展开/收起侧边栏 -->
+        <div id="sidebarToggle" class="sidebar-toggle">
+          <i id="toggleIcon" class="bi bi-chevron-compact-left"></i>
+        </div>
+        <div id="resultContainer" class="mt-0 h-100 overflow-auto">
+  
+          <!-- <p id="resultText" class="markdown whitespace-pre-line"></p> -->
+          <div class="m-0" id="resultText"></div>
+
+          <!-- 编辑器下面的按钮 -->
+          <!-- <div class="row col mb-2">
+          <button id="clear-md" class="btn btn-outline-primary btn-sm mr-2">清空内容</button>
+          <button id="download-md" class="btn btn-outline-success btn-sm">下载内容</button>
+        </div> -->
+          <div class="row">
+            <div class="col-auto input-group mb-3">
+              <textarea class="form-control" id="promptInput" rows="5" placeholder="输入提示…"
+                style="resize: none;">
+              </textarea>
+              <div id="fileListPopup" style="display:none; position:absolute; background:white; border:1px solid black;">
+                <!-- 文件列表将在这里动态生成 -->88888888
+                899
+              </div>
+            </div>
+          </div>
+          <div class="row msg-tool">
+            <div class="plugin-btn">
+              <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="功能选择">
+                <!-- 1 -->
+                <div type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-patch-plus"></i>
+                </div>
+                <div class="dropdown-menu p-2" id="function-selete">
+                  <!-- Dropdown menu links -->
+                  <label for="">功能选择</label>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="img-analysis-switch">
+                    <label class="custom-control-label" for="img-analysis-switch">图像分析</label>
+                  </div>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="reptile-seleted">
+                    <label class="custom-control-label" for="reptile-seleted">URL网页爬虫</label>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- 随机性 -->
+              <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="随机性选择">
+                <div type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-droplet-half"></i>
+                </div>
+                <div class="dropdown-menu p-2" style="width: 350px;max-width: 500px;">
+                  <div class="form-group">
+                    <label for="formControlRange1">随机性</label>
+                    <div class="row align-items-center">
+                      <div class="col-8">
+                        <input type="range" class="form-control-range" id="formControlRange1" min="0" max="1" step="0.01" value="0.78" oninput="updateValue(this.value,1)">
+                      </div>
+                      <div class="col-4">
+                        <input type="number" class="form-control" id="inputValue1" min="0" max="1" step="0.01" value="0.78" oninput="updateRange(this.value,1)">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="formControlRange2">最大字符</label>
+                    <div class="row align-items-center">
+                      <div class="col-8">
+                        <input type="range" class="form-control-range" id="formControlRange2" min="0" max="4096" step="1" oninput="updateValue(this.value,2)">
+                      </div>
+                      <div class="col-4">
+                        <input type="number" class="form-control" id="inputValue2" min="0" max="4096" step="1" oninput="updateRange(this.value,2)">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="formControlRange3">对话论数</label>
+                    <div class="row align-items-center">
+                      <div class="col-8">
+                        <input type="range" class="form-control-range" id="formControlRange3" min="0" max="30" step="1" value="30" oninput="updateValue(this.value,3)">
+                      </div>
+                      <div class="col-4">
+                        <input type="number" class="form-control" id="inputValue3" min="0" max="30" step="1" value="30" oninput="updateRange(this.value,3)">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+  
+              <!-- 文件上传 -->
+              <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="文件上传">
+                <div type="button" id="docfile-selete" class="btn" data-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="dropdown-menu p-2 docfile-selete" style="width: 450px;max-width: 600px;">
+                  <!-- 文件列表容器 -->
+                  <div class="row mb-2">
+                    <div class="col-auto">
+                      <div class="custom-file mb-2" id="fileListContainer">
+                        <!-- 显示可以勾选的文件列表 -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+  
+              <!-- url爬虫 -->
+              <div class="btn-group dropup"  data-toggle="tooltip" data-placement="bottom" title="URL网页爬虫">
+                <div type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-browser-chrome"></i>
+                </div>
+                <div class="dropdown-menu p-2" style="width: 450px;max-width: 600px;">
+                  <div class="col-auto">
+                    <p class="text-gray-500 text-sm mb-2">网页抓取的源内容/待处理文本</p>
+                    <textarea class="form-control" id="editorText" rows="13"></textarea>
+                    <div class="input-group mt-2">
+                      <input type="text" class="form-control" id="urlInput" placeholder="输入网址…">
+                      <div class="input-group-append">
+                        <button id="getUrlContentBtn" class="btn btn-primary">抓取</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- 图像分析上传 -->
+              <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="仅支持Google gemini-pro-version模型">
+                <div type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-image"></i>
+                </div>
+                <div class="dropdown-menu p-2 images-selete" style="width: 450px;max-width: 600px;">
+                  <!-- google gemin 图片上传 -->
+                  <div class="row gemini-file mb-2">
+                    <div class="col-auto">
+                      <img id="previewImage" src="#" alt="预览图"
+                        style="display:none; max-width: 100%; max-height: 200px;margin-bottom: 4px;">
+                      <div class="custom-file mb-2">
+                        <input type="file" class="custom-file-input" id="inputFile" accept="image/*">
+                        <label class="custom-file-label" for="inputFile">选择图片</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- 字数统计 -->
+              <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="支持的最大tokens">
+                <span id="charCount"></span>
+                <span id="maxCharCount"></span>
+              </div>
+              <!-- <div class="input-group-text chat-count"></div> -->
+  
+  
+            </div>
+            <!-- 底部设置 -->
+            <div class="setting">
+              <div class="col d-flex align-items-center">
+                <label for="model" class="ai-model-view mb-0"></label>
+  
+                <!-- 清空编辑器内容 -->
+                <div class="btn-group dropup">
+                  <div type="button" class="btn" id="clear-md" data-toggle="tooltip" data-placement="bottom" title="清空编辑器内容">
+                    <svg t="1704722324574" class="icon" viewBox="0 0 1027 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="36195" width="20" height="20"><path d="M934.73147221 964.82948779h-841.44987591a32.36345629 32.36345629 0 0 1 0-64.72691371h841.44987591a32.36345629 32.36345629 0 0 1 0 64.72691371z" fill="#4C565F" p-id="36196"></path><path d="M392.25521038 375.10257778l227.64455481-229.9747237 275.99555926 273.21230222-227.70928186 229.9747237z" fill="#7C858C" p-id="36197"></path><path d="M941.39834482 372.44877483l-275.93083221-273.27702926a64.72691371 64.72691371 0 0 0-91.58858298 0.45308814L118.46036594 559.50955406a64.72691371 64.72691371 0 0 0 0.45308814 91.52385593l164.14745259 162.52928a64.59745963 64.59745963 0 0 0 45.43829333 18.70607815l220.97768334 0.45308815h0.12945295c17.28208555 0 33.85217593-6.92577963 46.02083555-19.1591663l346.22426112-349.65478628a64.59745963 64.59745963 0 0 0-0.45308814-91.45912888z m-391.79200853 395.61089479l-220.97768221-0.45308815-164.14745259-162.52928 201.36542777-203.37196259 274.63629369 274.63629483-90.87658666 91.71803591z m136.44433408-137.73887147L411.41437667 355.68450333l208.48538852-210.55664925h0.06472704l275.93083222 273.27702926-209.84465408 211.91591481z" fill="#4C565F" p-id="36198"></path></svg>
+                  </div>
+                </div>
+
+                <!-- 清空上下文对话 -->
+                <div class="btn-group dropup">
+                  <div type="button" class="btn pl-0" id="clear-history-tool" data-toggle="tooltip" data-placement="bottom" title="清空上下文">
+                    <svg t="1705511334034" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4677" width="20" height="20"><path d="M274.5344 582.0928h480.9728v265.0624H274.5344z" fill="#D9FFEC" p-id="4678"></path><path d="M852.6336 539.9552H177.408c-43.9296 0-79.6672-35.7376-79.6672-79.6672V335.8208c0-43.9296 35.7376-79.6672 79.6672-79.6672h159.8976V175.7184c0-48.5376 39.4752-88.064 88.064-88.064h179.3536c48.5376 0 88.064 39.4752 88.064 88.064v80.4864h159.8976c43.9296 0 79.6672 35.7376 79.6672 79.6672v124.5184c-0.0512 43.8784-35.7888 79.5648-79.7184 79.5648z m-672.9728-81.92h670.72V338.1248H651.776c-22.6304 0-40.96-18.3296-40.96-40.96V175.7184c0-3.3792-2.7648-6.144-6.144-6.144H425.3696c-3.3792 0-6.144 2.7648-6.144 6.144v121.4464c0 22.6304-18.3296 40.96-40.96 40.96H179.6608v119.9104z" fill="#34333A" p-id="4679"></path><path d="M390.5536 889.9072c-22.6304 0-40.96-18.3296-40.96-40.96v-173.6704c0-22.6304 18.3296-40.96 40.96-40.96s40.96 18.3296 40.96 40.96v173.6704c0 22.6304-18.3296 40.96-40.96 40.96z" fill="#3AD285" p-id="4680"></path><path d="M797.7472 932.1472H232.2944c-53.1456 0-96.3584-43.2128-96.3584-96.3584v-255.9488h81.92v255.9488c0 7.9872 6.5024 14.4384 14.4384 14.4384H797.696c7.9872 0 14.4384-6.5024 14.4384-14.4384v-255.9488h81.92v255.9488c0.0512 53.0944-43.1616 96.3584-96.3072 96.3584z" fill="#34333A" p-id="4681"></path></svg>
+                  </div>
+                </div>
+  
+                <!-- 文本拼接模式设置 -->
+                <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="编辑器文本拼接方式">
+                  <div type="button" class="btn pr-0 pl-0" data-toggle="dropdown" aria-expanded="false">
+                    <svg t="1704677344355" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="18970" width="20" height="20">
+                      <path
+                        d="M498 420v396c0 11.044-8.954 20-20 20H272c-44.182 0-80-35.816-80-80V420c0-11.046 8.954-20 20-20h266c11.046 0 20 8.954 20 20z"
+                        fill="#4988FD" p-id="18971"></path>
+                      <path
+                        d="M458 836h-186c-44.112 0-80-35.888-80-80V440c0-22.056 17.944-40 40-40h226c22.056 0 40 17.944 40 40v356c0 22.056-17.944 40-40 40zM252 460v296c0 11.028 8.972 20 20 20h166V460h-186z"
+                        fill="#4988FD" p-id="18972"></path>
+                      <path
+                        d="M526 612V216c0-11.046 8.954-20 20-20h206c44.184 0 80 35.818 80 80v336c0 11.044-8.954 20-20 20H546c-11.046 0-20-8.956-20-20z"
+                        fill="#4988FD" p-id="18973"></path>
+                      <path
+                        d="M792 632H566c-22.056 0-40-17.944-40-40V236c0-22.056 17.944-40 40-40h186c44.112 0 80 35.888 80 80v316c0 22.056-17.944 40-40 40z m-206-60h186V276c0-11.028-8.972-20-20-20h-166v316z"
+                        fill="#4988FD" p-id="18974"></path>
+                      <path
+                        d="M498 216v136c0 11.046-8.954 20-20 20H212c-11.046 0-20-8.954-20-20v-76c0-44.182 35.818-80 80-80h206c11.046 0 20 8.954 20 20z"
+                        fill="#DFECFD" p-id="18975"></path>
+                      <path
+                        d="M458 372H232c-22.056 0-40-17.944-40-40v-56c0-44.112 35.888-80 80-80h186c22.056 0 40 17.944 40 40v96c0 22.056-17.944 40-40 40z m-206-60h186v-56h-166c-11.028 0-20 8.972-20 20v36z"
+                        fill="#DFECFD" p-id="18976"></path>
+                      <path
+                        d="M526 816v-136c0-11.044 8.954-20 20-20h266c11.046 0 20 8.956 20 20v76c0 44.184-35.816 80-80 80H546c-11.046 0-20-8.956-20-20z"
+                        fill="#DFECFD" p-id="18977"></path>
+                      <path
+                        d="M752 836h-186c-22.056 0-40-17.944-40-40v-96c0-22.056 17.944-40 40-40h226c22.056 0 40 17.944 40 40v56c0 44.112-35.888 80-80 80z m-166-60h166c11.028 0 20-8.972 20-20v-36h-186v56z"
+                        fill="#DFECFD" p-id="18978"></path>
+                    </svg>
+                  </div>
+                  <div class="dropdown-menu dropdown-menu-right p-2" style="width: 450px;max-width: 600px;">
+                    <div class="row">
+                      <div class="col-auto input-group mb-3">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">文本模式</div>
+                        </div>
+                        <select class="form-control" id="continueSeparator">
+                          <option value="piece">拼接</option>
+                          <option value="break">换行</option>
+                          <option value="dash">横线</option>
+                          <option value="dialog">对话模式</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- 角色选择 -->
+                <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="角色设定">
+                  <div type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+                    <svg t="1704652019644" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="10022" width="20" height="20">
+                      <path
+                        d="M283.40842 277.073776a423.11586 423.11586 0 0 0 129.115065-8.516825 673.851185 673.851185 0 0 0 132.010786-56.722054 269.302003 269.302003 0 0 0 89.426661 46.842537c48.205229 12.775237 106.460311 25.550475 106.460311 25.550475l4.258413 49.738257h26.913167s56.722054-160.456981-4.258413-238.471097-209.854565-55.529698-209.854565-55.529698S357.33446-26.636199 282.045728 69.774258s-68.134599 198.782693-32.704608 255.504747l31.17158 7.154133z"
+                        fill="#FFF385" p-id="10023"></path>
+                      <path
+                        d="M443.865401 695.420214h133.032805l29.808887 92.663055 81.931855 12.775238v46.842536s-60.639793 29.808887-175.616929 35.089319a284.291615 284.291615 0 0 1-194.864953-72.393012l105.438292-19.077687z"
+                        fill="#FFECE3" p-id="10024"></path>
+                      <path
+                        d="M232.307471 837.821527c-42.584124 49.738257-51.100949 167.440777-51.10095 167.440777h655.795517s9.879517-103.564591-46.842537-158.923953a185.32611 185.32611 0 0 0-104.927283-43.26547 254.142055 254.142055 0 0 1-162.671355 55.359362 338.969631 338.969631 0 0 1-190.606541-52.122968 97.602813 97.602813 0 0 0-99.646851 31.512252z"
+                        fill="#CE66FF" p-id="10025"></path>
+                      <path
+                        d="M758.306576 352.873517a56.89239 56.89239 0 0 0-17.03365 2.555048V272.815364l-96.580794-15.670958-102.201899-40.36975-129.115065 43.26547-120.598241 12.775238v82.442864a57.4034 57.4034 0 1 0-1.022019 103.905264v30.830906s23.506437 212.920622 227.910234 212.920622c161.819673 0 223.651822-200.145385 223.651822-200.145384v-37.47403a56.89239 56.89239 0 0 0 17.03365 2.555047 57.4034 57.4034 0 0 0 0-114.977136z"
+                        fill="#FFECE3" p-id="10026"></path>
+                      <path
+                        d="M487.812217 544.672414a49.056911 24.869129 90 1 0 49.738258 0 49.056911 24.869129 90 1 0-49.738258 0Z"
+                        fill="#EC7094" p-id="10027"></path>
+                      <path
+                        d="M685.232218 525.42439m-46.842537 0a46.842537 46.842537 0 1 0 93.685074 0 46.842537 46.842537 0 1 0-93.685074 0Z"
+                        fill="#EC7094" p-id="10028"></path>
+                      <path
+                        d="M338.767782 525.42439m-46.842537 0a46.842537 46.842537 0 1 0 93.685074 0 46.842537 46.842537 0 1 0-93.685074 0Z"
+                        fill="#EC7094" p-id="10029"></path>
+                      <path
+                        d="M596.316566 315.229151a69.667628 69.667628 0 0 0-43.77648 13.286247 12.604901 12.604901 0 0 0-1.533028 17.03365 12.945574 12.945574 0 0 0 17.885332 1.873702 46.331527 46.331527 0 0 1 27.424176-6.472787 47.012873 47.012873 0 0 1 27.594513 7.324469 12.775237 12.775237 0 0 0 17.03365-19.759034 70.178637 70.178637 0 0 0-44.628163-13.286247zM471.459914 328.515398a70.348974 70.348974 0 0 0-44.628163-13.286247 69.667628 69.667628 0 0 0-43.77648 13.286247 12.604901 12.604901 0 0 0-1.533028 17.03365 12.945574 12.945574 0 0 0 17.885332 1.873702A46.331527 46.331527 0 0 1 426.831751 340.949963a47.012873 47.012873 0 0 1 27.594513 7.324469 12.775237 12.775237 0 0 0 17.03365-19.759034z"
+                        fill="#4C4497" p-id="10030"></path>
+                      <path
+                        d="M429.727472 422.881818m-33.896963 0a33.896963 33.896963 0 1 0 67.793926 0 33.896963 33.896963 0 1 0-67.793926 0Z"
+                        fill="#4C4497" p-id="10031"></path>
+                      <path
+                        d="M594.272528 422.881818m-33.896963 0a33.896963 33.896963 0 1 0 67.793926 0 33.896963 33.896963 0 1 0-67.793926 0Z"
+                        fill="#4C4497" p-id="10032"></path>
+                      <path
+                        d="M849.606939 924.352467a156.028232 156.028232 0 0 0-139.164919-136.269198l-77.503107-8.005815a27.25384 27.25384 0 0 1-23.847109-21.632735l-11.923555-58.255083a243.240519 243.240519 0 0 0 157.050251-204.403797 87.723296 87.723296 0 0 0 41.902778-160.116308c9.198171-26.402157 54.167006-169.144142-23.506436-256.867438C697.666783-4.492455 582.859983 14.925906 555.77648 20.887683 526.819275 10.156484 390.89075-33.790332 282.897411 51.377916c-116.850837 91.300363-70.859983 241.877827-54.337343 285.313634a87.723296 87.723296 0 0 0 41.732442 160.286645 243.240519 243.240519 0 0 0 157.050251 204.403797l-12.264228 59.106765a27.25384 27.25384 0 0 1-23.84711 21.632735l-77.503106 8.005815a156.028232 156.028232 0 0 0-139.164919 136.269198l-10.22019 78.695462a17.03365 17.03365 0 0 0 14.648939 17.203987h2.214374a17.03365 17.03365 0 0 0 17.03365-14.819276l10.22019-78.695462a122.131269 122.131269 0 0 1 108.845022-106.119638l19.418361-2.044038A345.953427 345.953427 0 0 0 512 865.586376c11.923555 0 23.84711 0 35.429992-1.533029a8.516825 8.516825 0 0 0 7.665142-9.198171 8.687161 8.687161 0 0 0-9.198171-7.665142c-11.071872 1.022019-22.484418 1.533028-34.067299 1.533028A341.524678 341.524678 0 0 1 366.702967 817.892156l28.105523-2.89572A61.150803 61.150803 0 0 0 448.464486 766.791207l11.582882-56.211044a238.471097 238.471097 0 0 0 103.905264 0l11.582882 56.211044a61.150803 61.150803 0 0 0 53.826333 48.545902l27.764849 2.89572a284.291615 284.291615 0 0 1-27.594513 11.582882 8.516825 8.516825 0 0 0 2.895721 17.03365 8.516825 8.516825 0 0 0 2.89572 0 287.528008 287.528008 0 0 0 52.293305-24.528456l19.418361 2.044038a122.131269 122.131269 0 0 1 108.845022 106.119638l10.22019 78.695462a17.03365 17.03365 0 0 0 17.03365 14.819276h2.214374a17.03365 17.03365 0 0 0 14.648939-19.077688z m-94.707093-461.952581v-61.150803l17.03365 9.70918a8.516825 8.516825 0 1 0 8.176151-14.989612l-25.891147-14.137929v-25.720811a53.826333 53.826333 0 0 1 0 106.289975zM223.790646 409.084562a53.99667 53.99667 0 0 1 45.309508-53.144988v25.891148l-25.891147 14.137929a8.516825 8.516825 0 1 0 8.176151 14.989612l17.03365-9.70918v61.150803A53.99667 53.99667 0 0 1 223.790646 409.084562z m62.343158-144.786023a17.03365 17.03365 0 0 0-17.03365 17.033649v40.710423a89.767334 89.767334 0 0 0-9.198171 1.022019c-14.648939-38.155375-54.507679-168.29246 43.946817-245.284556C399.237238 3.172688 525.967593 46.267822 546.0673 53.421954l-1.703365 24.017447a8.516825 8.516825 0 0 0 7.835478 9.027834 8.516825 8.516825 0 0 0 8.516825-8.005815L563.100949 54.443973C580.986282 50.185561 683.528853 30.937537 746.723694 102.478866s26.572494 193.842934 17.03365 221.437447a89.426661 89.426661 0 0 0-9.198171-1.022019v-41.391769a17.03365 17.03365 0 0 0-16.181967-17.03365 393.647646 393.647646 0 0 1-95.558776-22.314081 307.627715 307.627715 0 0 1-89.085988-46.501864l-1.533029-0.851682 5.961778-86.360605a8.516825 8.516825 0 0 0-17.03365-1.192355l-5.961777 86.360604a17.03365 17.03365 0 0 0-3.066057 1.703365 337.266266 337.266266 0 0 1-104.0756 49.738257 562.110443 562.110443 0 0 1-141.54963 19.418361z m17.03365 208.321536V298.195502a573.352651 573.352651 0 0 0 134.906506-20.44038 391.773945 391.773945 0 0 0 104.756946-48.034892A367.586162 367.586162 0 0 0 631.235548 274.178056a483.074308 483.074308 0 0 0 88.745316 22.484417v176.127939a208.832546 208.832546 0 0 1-417.665093 0z"
+                        fill="#4C4497" p-id="10033"></path>
+                      <path
+                        d="M597.168249 838.673209l-11.242209 2.555048a8.516825 8.516825 0 0 0 1.703365 17.033649h1.703365l11.923555-2.725384a8.516825 8.516825 0 1 0-3.91774-17.033649zM512 488.120697c-20.610716 0-36.792684 24.017446-36.792684 54.848352s16.181967 54.848352 36.792684 54.848352 36.792684-24.017446 36.792684-54.848352-16.181967-54.848352-36.792684-54.848352z m0 92.663054c-9.368507 0-19.759034-15.500621-19.759034-37.814702s10.390526-37.814703 19.759034-37.814703 19.759034 15.500621 19.759034 37.814703-10.390526 37.814703-19.759034 37.814702z"
+                        fill="#4C4497" p-id="10034"></path>
+                    </svg>
+                  </div>
+                  <div class="dropdown-menu dropdown-menu-right p-2" style="width: 450px;max-width: 600px;">
+                    <div class="row">
+                      <div class="col-auto input-group mb-2">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">选择角色</div>
+                        </div>
+                        <select class="form-control" id="role-select">
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-auto input-group mb-2">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">角色设定</div>
+                        </div>
+                        <textarea class="form-control" id="roleInput" placeholder="设定角色…"
+                          rows="5">你现在承担的是内容优化专家的角色，针对杂乱的图文，需要进行图文重新排版优化，要求：必须保留原文的图片，并以markdown格式返回</textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- 历史对话管理 -->
+                <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="历史对话">
+                  <div type="button" class="btn pr-0 pl-0" id="open-off-canvas">
+                    <svg t="1704652365322" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="12203" width="20" height="20">
+                      <path
+                        d="M662.272 605.0816m-179.0976 0a179.0976 179.0976 0 1 0 358.1952 0 179.0976 179.0976 0 1 0-358.1952 0Z"
+                        fill="#FFBE0A" p-id="12204"></path>
+                      <path
+                        d="M553.4208 122.2144c-213.8624 0-387.84 173.9776-387.84 387.84 0 11.1104 0.512 22.1696 1.4848 33.1776l-44.288-31.6416c-16.0768-11.52-38.5024-7.7824-50.0224 8.2944s-7.7824 38.5024 8.2944 50.0224l120.576 86.2208c6.144 4.4032 13.4144 6.7072 20.8384 6.7072a35.75296 35.75296 0 0 0 29.4912-15.4624l78.4384-113.5104c11.264-16.2816 7.168-38.6048-9.1136-49.8688-16.2816-11.264-38.6048-7.168-49.8688 9.1136l-32.7168 47.3088c-0.9728-10.0352-1.4848-20.1728-1.4848-30.3104 0-174.336 141.824-316.16 316.16-316.16s316.16 141.824 316.16 316.16-141.824 316.16-316.16 316.16c-85.2992 0-165.3248-33.4848-225.1776-94.2592-13.8752-14.08-36.608-14.2848-50.688-0.3584-14.08 13.8752-14.2848 36.608-0.3584 50.688 73.472 74.5472 171.5712 115.6096 276.2752 115.6096 213.8624 0 387.84-173.9776 387.84-387.84s-173.9776-387.8912-387.84-387.8912z"
+                        fill="#34332E" p-id="12205"></path>
+                      <path
+                        d="M543.1808 285.6448c-19.8144 0-35.84 16.0256-35.84 35.84v192.1536c0 11.6736 5.6832 22.6304 15.2576 29.3376l136.0896 95.4368c6.2464 4.4032 13.4656 6.5024 20.5312 6.5024 11.264 0 22.4256-5.3248 29.3888-15.2576a35.85536 35.85536 0 0 0-8.7552-49.92L579.072 495.0016V321.4848a35.8912 35.8912 0 0 0-35.8912-35.84z"
+                        fill="#34332E" p-id="12206"></path>
+                    </svg>
+                  </div>
+                </div>
+  
+                <!-- 模型接口设置 -->
+                <div class="btn-group dropup" data-toggle="tooltip" data-placement="bottom" title="模型接口设置">
+                  <div type="button" class="btn" data-toggle="modal" data-target="#configModal">
+                    <svg t="1704652411738" class="icon" viewBox="0 0 1032 1024" version="1.1"
+                      xmlns="http://www.w3.org/2000/svg" p-id="13439" width="20" height="20">
+                      <path
+                        d="M613.112 232l9.944 69 3.984 28.528 25.872 11.944c10.616 5.304 21.896 11.28 31.84 17.912l23.232 15.256 25.872-9.952 67.672-26.536 63.024 105.488-55.728 42.464 16.232 85.52 23.224 17.92L904 632l-101.808 130.752-68.336-26.528-25.872-9.96-23.224 15.264a192.296 192.296 0 0 1-31.84 17.912l-25.88 11.944-3.984 27.864L608 888H488l-72-8-32-120-40-16-46.688 18.752-63.032-105.48 55.736-42.464 23.216-17.92-2.656-29.184c-0.664-5.968-0.664-11.944-0.664-17.248s0-11.28 0.664-17.248l2.656-29.2-23.216-17.904-55.736-42.464 62.368-105.488 68.336 26.536 25.872 9.952 23.224-15.256a192.72 192.72 0 0 1 31.84-17.92l25.872-11.936L485.728 232h127.384z"
+                        fill="#FFCB01" p-id="13440"></path>
+                      <path
+                        d="M591.52 97.344H432.8c-25.28 0-46 17.8-49.76 41.544L371.2 224.944c-14.8 6.68-28.96 14.84-43.76 24.48l-83.84-32.64c-5.92-2.224-11.92-2.968-17.84-2.968-17.76 0-34.88 8.904-43.04 24.488L103.36 371.84c-12.56 20.776-7.44 48.224 11.84 63.056l70.48 53.424c-0.72 8.904-1.44 17.064-1.44 24.48s0 15.576 1.44 24.48l-70.48 53.424c-19.28 14.832-24.4 40.8-11.84 63.056l78.64 132.792c8.88 15.584 26 25.232 43.76 25.232 5.92 0 11.12-0.744 17.12-2.968l83.84-32.64a281.624 281.624 0 0 0 43.76 24.472l12.56 85.32c2.96 23.744 24.48 42.288 49.76 42.288h158.72c25.28 0 46-17.8 49.68-41.544l12.64-86.064c14.88-6.672 28.96-14.832 43.76-24.472l83.84 32.64c5.92 2.224 11.92 2.968 17.84 2.968 17.76 0 34.88-8.904 43.04-24.488l79.36-134.28c11.84-21.512 6.64-47.48-12.64-62.312l-70.48-53.424c0.8-7.416 1.52-15.584 1.52-24.48 0-8.904-0.72-17.064-1.52-24.48l70.48-53.424c19.28-14.832 24.48-40.8 11.92-63.056l-78.64-132.8c-8.96-15.576-26-25.224-43.76-25.224-6 0-11.2 0.744-17.12 2.968l-83.84 32.64a282.336 282.336 0 0 0-43.76-24.48l-12.64-85.312c-3.68-24.488-24.4-42.288-49.68-42.288z m-8.16 59.344l11.12 77.16 4.48 31.904 28.96 13.352c11.84 5.936 24.48 12.616 35.6 20.032l25.92 17.064 28.96-11.128 75.68-29.672 70.48 117.952-62.32 47.488-26 20.032 2.96 32.64c0.8 6.672 0.8 13.352 0.8 19.288s0 12.616-0.8 19.288l-2.96 32.64 26 20.032 62.32 47.488-69.76 117.952-76.4-29.672-28.96-11.128-25.92 17.064c-11.92 8.16-23.76 14.84-35.6 20.032l-28.96 13.352-4.48 31.16-11.12 77.904h-142.4l-11.12-77.16-4.48-31.904-28.96-13.352c-11.84-5.936-24.48-12.616-35.6-20.032l-25.92-17.064-28.96 11.128-75.68 29.672-70.48-117.952 62.32-47.488 26-20.032-3.04-32.64c-0.72-6.672-0.72-13.352-0.72-19.288s0-12.616 0.72-19.288l3.04-32.64-26-20.032-62.32-47.488 69.76-117.952 76.4 29.672 28.96 11.128 25.92-17.064c11.92-8.16 23.76-14.84 35.6-20.032l28.96-13.352 15.6-109.064h142.4z"
+                        p-id="13441"></path>
+                      <path
+                        d="M512.16 334.744c-97.92 0-178.08 80.128-178.08 178.056 0 97.928 80.16 178.056 178.08 178.056 97.92 0 178.08-80.128 178.08-178.056 0-97.928-80.16-178.056-178.08-178.056z m0 59.352c65.28 0 118.72 53.416 118.72 118.704s-53.44 118.704-118.72 118.704S393.44 578.088 393.44 512.8s53.44-118.704 118.72-118.704z"
+                        p-id="13442"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row generate-btn">
+            <div class="col-auto button-group">
+              <!-- <button id="generateBtn" class="btn btn-primary d-none mb-2">
+              URL文本预处理
+            </button> -->
+              <button id="continueBtn" class="btn btn-primary mb-2">
+                开始
+              </button>
+              <button id="stopBtn" disabled class="btn btn-secondary mb-2">
+                <!-- 停止 -->
+                <i class="bi bi-stop-fill"></i>
+              </button>
+            </div>
+          </div>
+          <div class="seleted-document">
+          </div>
+        </div>
+
+        
+
+      </div>
+
+
+
+
+    </div>
+  </div>
+
+  
+
+
+
+
+
+
+
+  <!-- 历史记录 -->
+  <div id="myOffcanvas" class="offcanvas">
+    <div class="offcanvas-header">
+      <h5>历史对话管理器 &nbsp;<span class="history-num">0</span>条</h5>
+      <button type="button" class="close" aria-label="Close" id="close-off-canvas">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+
+
+    <div class="offcanvas-body">
+      <!-- 历史记录下载和上传表单 -->
+      <div class="row history-btn d-flex">
+        <div class="col-auto mb-2">
+          <button class="btn btn-primary btn-sm" id="clear-history">清空</button>
+          <button class="btn btn-primary btn-sm" id="download-history">下载历史记录</button>
+          <input type="file" id="upload-history" style="display: none;">
+          <label for="upload-history" class="btn btn-primary btn-sm mb-0">上传历史记录</label>
+        </div>
+      </div>
+
+
+      <!-- 历史记录容器 -->
+      <div id="historyContainer"></div>
+
+      <!-- 编辑模态框 -->
+      <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">编辑记录</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <textarea id="editInput" class="form-control" rows="8"></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+              <button type="button" class="btn btn-primary" id="saveEdit">保存更改</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- 模态框 -->
+  <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="configModalLabel">设置</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- 表单内容 -->
+          <form>
+            <div class="form-group">
+              <label for="interface-type">接口类型</label>
+              <select class="form-control" id="interface-type">
+              </select>
+            </div>
+            <div class="form-group openai-model">
+              <label for="ai-model-type">模型选择</label>
+              <select class="form-control" id="ai-model-type">
+
+              </select>
+            </div>
+            <div class="form-group interface-url-input d-none">
+              <label for="interface-url">接口地址</label>
+              <input type="text" class="form-control" id="interface-url" placeholder="http://127.0.0.1:8000">
+            </div>
+            <div class="form-group">
+              <label for="token">Token</label>
+              <input type="text" class="form-control" id="token" placeholder="输入Token">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="save-button">提交</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 新会话模态框 -->
+  <div class="modal fade" id="newConversationModal" tabindex="-1" role="dialog"
+    aria-labelledby="newConversationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newConversationModalLabel">新会话设置</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="关闭">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control" id="newConversationTitle" placeholder="输入对话标题">
+          <div class="form-group mt-3">
+            <label for="interfaceSelector">选择接口</label>
+            <select class="form-control" id="interfaceSelector">
+              <!-- 下拉框选项将会动态添加到这里 -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary" id="saveNewConversation">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 修改标题模态框 -->
+  <div class="modal" id="editTitleModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">修改对话标题</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control" id="newTitle">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="saveTitleChange">保存</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认模态框 -->
+  <div class="modal" id="confirmDeleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">确认删除</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>确定要删除这个会话吗？</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="confirmDelete">删除</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 重命名用户文件夹模态框 -->
+  <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="renameModalLabel">重命名文件</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label for="newFileName">新文件名：</label>
+          <input type="text" class="form-control" id="newFileName">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="saveRename">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认模态框 -->
+  <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">确认删除文件</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>您确定要删除这个文件吗？</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">确认删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- <script type="module" src="./js/main.js"></script> -->
+
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+
+  <script type="module" src="./js/bootstrap/js/bootstrap.bundle.js"></script>
+  <!-- <script src="./js/bootstrap/js/popper.js"></script> -->
+
+
+  <script src="./js/jquery-3.6.0.min.js"></script>
+
+    <!-- 讯飞星火 -->
+    <script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.5/base64.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+    
+  <!-- <script src="./js/marked.min.js"></script> -->
+
+  <!-- 在 body 结束标签前添加 -->
+  <!-- <script src="./js/editor.md/editormd.min.js"></script>
+  <script src="./js/raphael-min.js"></script>
+  <script src="./js/flowchart.min.js"></script> -->
+
+  <!-- 时序图 -->
+  <!-- <script src="./js/sequence/webfont.js"></script>
+  <script src="./js/sequence/snap.svg-min.js"></script>
+  <script src="./js/sequence/underscore-min.js"></script>
+  <script src="./js/sequence/sequence-diagram-min.js"></script> -->
+  
+  <!-- <script src="./js/toastui-editor-all.min.js"></script> -->
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/tui-editor/1.4.9/tui-editor-Editor-full.js"></script> -->
+
+
+      <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+     
+
+  <script src="./js/FileSaver.min.js"></script>
+
+  <!-- Dexie.js 数据库操作 -->
+  <script src="./js/dexie.min.js"></script>
+  
+
+  <script type="module" src="./js/stream-response.js"></script>
+
+
+  <!-- 工具设置 -->
+  <script src="./js/plugin-setting.js"></script>
+
+  
+
+
+</body>
+
+</html>

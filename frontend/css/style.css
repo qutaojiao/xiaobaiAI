@@ -1,0 +1,449 @@
+html,
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* '更改默认的bootstarp样式' */
+/* .btn { */
+/* border-radius: 10px!important; */
+/* padding: 5px 15px!important; */
+/* } */
+
+.modal-content {
+    border-radius: 0.75rem;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #4d83ff !important;
+    border-color: #4d83ff !important;
+}
+
+
+/*  */
+
+
+
+.mindmap-content {
+    position: relative;
+}
+
+.mindmap-editor {
+    position: absolute;
+    right: 0;
+    background: #f9e67b;
+    padding: 0px 5px;
+    box-shadow: -1px 1px 1px 1px #e9dada;
+}
+
+/* .sidebar-toggle {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    z-index: 1000;
+} */
+
+
+.editormd-toolbar {
+    width: 100vw;
+}
+
+.editormd {
+    width: 100% !important;
+    border-radius: 5px;
+    border: solid 1px #e9e9e9;
+}
+
+.editormd-toolbar {
+    width: 100%;
+
+}
+
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+    width: 100%;
+}
+
+
+.chat-count {
+    position: absolute;
+    bottom: 0;
+    font-size: 10px;
+    background: unset;
+    border: 0;
+    z-index: 999;
+}
+
+/* 消息框 */
+.plugin-btn {
+    position: relative;
+    left: 5px;
+}
+
+.setting {
+    position: inherit;
+    right: 0;
+}
+
+.msg-tool{
+    width: 100%;
+    position: absolute;
+    bottom: 143px;
+    left: 16px;
+    z-index: 1040;
+    background: #fff;
+}
+
+#charCount {
+    color: #ffa3a3;
+    font-size: 10px;
+    padding: 5px 10px;
+    border: 1px solid #eeee;
+    border-radius: 20px;
+    background: #f4f4f4;
+}
+
+.no-border,
+.no-border:focus,
+.no-border:hover,
+.no-border:active {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+
+.left-content {
+    height: 100vh;
+    overflow: scroll;
+    box-shadow: -1px 0px 3px 0px #ececec;
+}
+
+.ai {
+    background: #fafafa;
+    border-radius: 10px;
+    margin-left: 26px;
+    padding: 15px;
+    margin-top: -10px;
+}
+
+/* 预览模式 */
+.editormd-fullscreen {
+    z-index: 1061;
+}
+
+/* .editormd-preview {
+    width: 100%!important;
+} */
+
+
+/* 历史消息 */
+.offcanvas {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    /* 开始时隐藏在视图外 */
+    width: 25em;
+    /* 可以根据需要调整宽度 */
+    height: 100%;
+    background-color: white;
+    box-shadow: -5px 0 5px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+    z-index: 1061;
+}
+
+.offcanvas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.offcanvas-body {
+    padding: 1rem;
+    height: 92%;
+    overflow: scroll;
+}
+
+.editormd {
+    margin: 0 auto 10px;
+}
+
+.history-btn {
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    background: #fff;
+    width: 100%;
+    padding-top: 9px;
+    box-shadow: 0px -1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ai-model-view.mb-0 {
+    color: #bbbbbb;
+    font-size: 12px;
+    margin-right: -5px;
+    margin-bottom: -5px!important;
+}
+
+
+/* 会话列表 */
+/* 默认隐藏图标 */
+.icon-hidden {
+    display: none;
+}
+
+/* 鼠标悬浮或选中会话时显示图标 */
+.list-group-item:hover .icon-hidden,
+.list-group-item.active .icon-hidden {
+    display: inline;
+}
+
+/* 去掉按钮在 :focus 和 :focus-visible 状态下的边框 */
+/* .btn:focus,
+.btn:focus-visible {
+  box-shadow: none;
+  border: none;
+  outline: none;
+} */
+
+#nav-function-tab {
+    border-bottom: 0;
+}
+
+/* 默认情况下按钮的下边框样式 */
+#nav-function-tab .btn {
+    padding-right: 0;
+    padding-left: 0;
+    border-radius: 0 !important;
+    border-bottom: 2px solid transparent;
+    /* 初始时透明 */
+}
+
+/* 活动状态下按钮的下边框样式 */
+#nav-function-tab .btn.active {
+    border-radius: 0 !important;
+    border-bottom: 3px solid #007bff;
+}
+
+/* 点击和悬浮状态下按钮的下边框样式 */
+#nav-function-tab .btn:focus,
+#nav-function-tab .btn:focus-visible {
+    border-radius: 0 !important;
+    box-shadow: none;
+    outline: none;
+    border-bottom: 3px solid #007bff;
+    ;
+    /* 无下边框 */
+}
+
+#conversationsList>a {
+    border: 0;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#conversationsList>.active {
+    color: #000;
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+#conversationsList>a:hover {
+    border: 0;
+    border-radius: 5px;
+}
+
+
+#promptInput {
+    padding-bottom: 22px;
+    padding-top: 34px;
+    height: 20vh;
+    border: 1px solid #f0f0f0 !important;
+    border-radius: 0;
+}
+
+#promptInput:focus {
+    box-shadow: none;
+    border: 0;
+}
+
+.generate-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    z-index: 1040;
+}
+
+#resultContainer {
+    overflow: hidden !important;
+}
+
+
+
+
+
+/* 左侧导航 */
+.left-menu {
+    max-width: 5%;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+    /* 确保所有列都在一行内 */
+}
+
+.custom-col1 {
+    flex: 0 0 65px;
+    /* 设置固定宽度 */
+    max-width: 65px;
+    /* 防止宽度拉伸 */
+}
+
+.custom-col2 {
+    flex: 0 0 20%;
+    /* 设置占据20%宽度 */
+    max-width: 20%;
+    min-width: 215px;
+    /* 防止宽度超出 */
+}
+
+.custom-col3 {
+
+    flex-grow: 1;
+    /* 使第三列占据所有剩余空间 */
+}
+
+#nav-menu-tab>.active {
+    background-color: #eee;
+    margin: 6px;
+}
+
+.tooltip-inner {
+    background-color: #333;
+    /* 设置背景颜色 */
+    color: #fff;
+    /* 设置文本颜色 */
+    border-radius: 4px;
+    /* 设置边框圆角 */
+    font-size: 14px;
+    /* 设置字体大小 */
+}
+
+.arrow::before {
+    border-top-color: #333 !important;
+    /* 设置箭头颜色 */
+}
+
+/* 侧边展开和折叠图标 */
+#sidebarToggle {
+    position: absolute;
+    z-index: 1060;
+    top: 50%;
+    transform: translateY(-100%);
+    color: #999999;
+    background: rgb(0 0 0 / 7%);
+    padding: 6px 0px;
+    border-radius: 0px 5px 5px 0;
+}
+
+
+#resultText {
+    border-radius: 0;
+    /* border: 1px solid #f0f0f0 !important; */
+    border-bottom: 0;
+}
+
+.editormd .CodeMirror,.editormd-toolbar {
+    border-right: 1px solid #f0f0f0;
+}
+
+.CodeMirror-gutters {
+    border-right: 1px solid #f0f0f0!important;
+}
+
+
+
+
+/* 用户文件夹展开折叠 */
+
+
+
+
+/* 编辑器设置 */
+/* .toastui-editor-md-tab-container {
+    display: none!important;
+} */
+
+.toastui-editor-md-tab-container .toastui-editor-tabs .tab-item {
+    background-image: url('/images/credit-card-2-front-fill.svg'); /* 替换为您的图标路径 */
+    background-repeat: no-repeat;
+    background-size: contain;
+    text-indent: -9999px; /* 隐藏文字 */
+    width: 24px; /* 根据您的图标尺寸调整 */
+    height: 24px; /* 根据您的图标尺寸调整 */
+}
+
+/* 编辑模式图标 */
+.toastui-editor-md-tab-container .toastui-editor-tabs .tab-item[aria-label="编辑"] {
+    background-image: url('/images/credit-card-2-front-fill.svg');
+    border:0;
+    margin:10px
+}
+
+/* 预览模式图标 */
+.toastui-editor-md-tab-container .toastui-editor-tabs .tab-item[aria-label="预览"] {
+    background-image: url('/images/eye-fill.svg');
+    border:0;
+    margin:10px;
+    margin-right:-20px
+}
+
+/* 默认字体大小 */
+.toastui-editor-contents p {
+    font-size: 16px;
+}
+
+.ProseMirror div {
+    font-size: 16px;
+}
+
+.lang-Assistant,.lang-User {
+    background-color: #f0f0f0!important;
+    border-radius: 20px!important;
+}
+
+.lang-Assistant code,.lang-User code {
+    font-size: 16px;
+}
+
+.toastui-editor-contents pre code {
+    font-size: 16px;
+}
+
+
+.seleted-document {
+    position: absolute;
+    z-index: 1010;
+    bottom: 20px;
+    left: 10px;
+}
+
+.seleted-document>span {
+    margin: auto 2px;
+    background-color: #f7f7f7;
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #4d83ff;
+}
+
+.nav-menu-bottom-tab{
+    position:absolute;
+    bottom:20px
+}

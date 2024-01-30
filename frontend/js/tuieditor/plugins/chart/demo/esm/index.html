@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <meta charset="UTF-8" />
+    <title>Editor</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/v4.1.4/toastui-chart.min.css" />
+  </head>
+  <body>
+    <div class="code-html">
+      <!-- Editor -->
+      <h2>Editor</h2>
+      <div id="editor"></div>
+      <!-- Editor's Viewer -->
+      <h2>Viewer</h2>
+      <div id="viewer"></div>
+    </div>
+    <!-- Editor -->
+    <script type="module">
+      import { Editor } from 'http://localhost:8080/dist/index.js';
+      import chartPlugin from '/dist/index.js';
+
+      const content = [
+        '$$chart',
+        ',category1,category2',
+        'Jan,21,23',
+        'Feb,31,17',
+        '',
+        'type: column',
+        'title: Monthly Revenue',
+        'x.title: Amount',
+        'y.title: Month',
+        'y.min: 1',
+        'y.max: 40',
+        'y.suffix: $',
+        '$$'
+      ].join('\n');
+
+      const chartOptions = {
+        minWidth: 100,
+        maxWidth: 600,
+        minHeight: 100,
+        maxHeight: 300
+      };
+
+      const editor = new Editor({
+        el: document.querySelector('#editor'),
+        previewStyle: 'vertical',
+        height: '500px',
+        initialValue: content,
+        plugins: [[chartPlugin, chartOptions]]
+      });
+
+      const viewer = Editor.factory({
+        el: document.querySelector('#viewer'),
+        viewer: true,
+        height: '500px',
+        initialValue: content,
+        plugins: [[chartPlugin, chartOptions]]
+      });
+    </script>
+  </body>
+</html>

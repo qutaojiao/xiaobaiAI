@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ESP32 OTA via BLE</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 在这里添加其他CSS或JavaScript引用 -->
+</head>
+
+<body>
+    <div class="App" id="top">
+        <header class="App-header" id="mid">
+            <p id="hw_version">Hardware: Not Connected</p>
+            <p id="sw_version">Software: Not Connected</p>
+            <p id="completion"></p>
+            <button id="connect-ble">Connect to Bluetooth</button>
+            <button id="code-ble-upload">Upload Firmware</button>
+
+            <input type="text" id="ble-serial-input" placeholder="Enter message" />
+            <button id="send-ble-msg">Send Message</button>
+
+            <!-- 在现有的按钮下面添加 -->
+            <textarea id="logOutput" rows="10" style="width: 100%;"></textarea>
+
+
+
+
+        </header>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            // const CryptoJS = require("crypto-js");
+
+            // 假设CryptoJS已经通过上述方法之一引入
+            function generateUUIDBasedOnNumber(number) {
+                let hash = CryptoJS.MD5(number.toString());
+                return hash.toString(CryptoJS.enc.Hex).substring(0, 8) + '-' +
+                    hash.toString(CryptoJS.enc.Hex).substring(8, 12) + '-' +
+                    hash.toString(CryptoJS.enc.Hex).substring(12, 16) + '-' +
+                    hash.toString(CryptoJS.enc.Hex).substring(16, 20) + '-' +
+                    hash.toString(CryptoJS.enc.Hex).substring(20);
+            }
+
+            var uniqueIdBasedOn1021 = generateUUIDBasedOnNumber(1);
+            console.log(uniqueIdBasedOn1021);
+
+
+            var _logCharacteristicUuid = generateUUIDBasedOnNumber(2); // 替换为用于日志的特性UUID
+            var _messageCharacteristicUuid = generateUUIDBasedOnNumber(3);
+
+            console.log("_logCharacteristicUuid", _logCharacteristicUuid);
+            console.log("_messageCharacteristicUuid", _messageCharacteristicUuid);
+
+            var esp32Service = null;
+            var updateData = null;
+            var totalSize;
+            var currentPosition;
+            var characteristicSize = 512;
+            var esp32Device = null; // 保存设备引用
+
+            // UUIDs
+            var myESP32 = 'd804b643-6ce7-4e81-9f8a-ce0f699085eb';
+            var otaServiceUuid = 'c8659210-af91-4ad3-a995-a58d6fd26145';
+            var versionCharacteristicUuid = 'c8659212-af91-4ad3-a995-a58d6fd26145';
+            var fileCharacteristicUuid = 'c8659211-af91-4ad3-a995-a58d6fd26145';
+            var logCharacteristicUuid = _logCharacteristicUuid; // 日志特性的UUID
+            var messageCharacteristicUuid = _messageCharacteristicUuid; // 消息特性的UUID
+            var messageCharacteristic = null;
+
+            $('#connect-ble').click(function () {
+                connectToESP32();
+            });
+
+            $('#code-ble-upload').click(function () {
+                // reconnectToESP32().then(() => {
+                    fetchFirmwareAndUpdate(); // 调用固件更新函数
+                // }).catch(error => {
+                //     console.error("Error during reconnection:", error);
+                //     // 处理连接错误
+                // });
+            });
+
+
+            $('#send-ble-msg').click(function () {
+                var message = $('#ble-serial-input').val();
+                sendMessageToESP32(message);
+            });
+
+            function connectToESP32() {
+                navigator.bluetooth.requestDevice({
+                    filters: [{ services: [myESP32] }],
+                    optionalServices: [otaServiceUuid]
+                })
+                .then(device => {
+                    esp32Device = device; // 保存设备引用
+                    esp32Device.addEventListener('gattserverdisconnected', reconnectToESP32);
+                    return device.gatt.connect();
+                })
+                .then(server => server.getPrimaryService(otaServiceUuid))
+                .then(service => {
+                    esp32Service = service;
+                    return checkVersion(service);
+                })
+                .then(() => {
+                    return esp32Service.getCharacteristic(logCharacteristicUuid);
+                })
+                .then(characteristic => {
+                    return characteristic.startNotifications().then(_ => {
+                        characteristic.addEventListener('characteristicvaluechanged', onLogReceived);
+                    });
+                })
+                .then(() => {
+                    return esp32Service.getCharacteristic(messageCharacteristicUuid);
+                })
+                .then(characteristic => {
+                    messageCharacteristic = characteristic;
+                })
+                .catch(error => {
+                    console.error('Connection failed', error);
+                });
+            }
+
+            function setupDevice(device) {
+                esp32Device = device;
+                esp32Device.addEventListener('gattserverdisconnected', reconnectToESP32);
+                return device.gatt.connect()
+                    .then(server => server.getPrimaryService(otaServiceUuid))
+                    .then(service => setupService(service));
+            }
+
+            function setupService(service) {
+                esp32Service = service;
+                return checkVersion(service)
+                    .then(() => esp32Service.getCharacteristic(logCharacteristicUuid))
+                    .then(characteristic => {
+                        return characteristic.startNotifications().then(() => {
+                            characteristic.addEventListener('characteristicvaluechanged', onLogReceived);
+                        });
+                    })
+                    .then(() => esp32Service.getCharacteristic(messageCharacteristicUuid))
+                    .then(characteristic => {
+                        messageCharacteristic = characteristic;
+                        return Promise.resolve(); // 确保最后返回一个Promise
+                    })
+                    .catch(error => {
+                        console.error('Error setting up service:', error);
+                        // throw error; // 确保错误可以被外部捕获
+                    });
+            }
+
+
+            function reconnectToESP32() {
+                console.log("Attempting to reconnect...");
+                esp32Device.gatt.connect()
+                .then(server => server.getPrimaryService(otaServiceUuid))
+                .then(service => {
+                    esp32Service = service;
+                    console.log("Reconnected to ESP32");
+                })
+                .catch(error => {
+                    console.error('Reconnection failed', error);
+                });
+            }
+
+
+            function onLogReceived(event) {
+                let logData = new TextDecoder().decode(event.target.value);
+                console.log('Received log:', logData);
+                $('#logOutput').append(logData + '\n');
+                // termSerialBLE.writeln(`${logData}`);
+            }
+
+
+
+
+
+
+
+            function checkVersion(service) {
+                return service.getCharacteristic(versionCharacteristicUuid)
+                    .then(characteristic => characteristic.readValue())
+                    .then(value => {
+                        var hardwareVersion = 'v' + value.getUint8(0) + '.' + value.getUint8(1);
+                        var softwareVersion = 'v' + value.getUint8(2) + '.' + value.getUint8(3) + '.' + value.getUint8(4);
+                        $('#hw_version').text('Hardware: ' + hardwareVersion);
+                        $('#sw_version').text('Software: ' + softwareVersion);
+                        return Promise.resolve(); // 确保返回一个Promise
+                    })
+                    .catch(error => {
+                        console.error('Failed to read version', error);
+                        // throw error; // 确保错误可以被外部捕获
+                    });
+            }
+
+
+            async function fetchFirmwareAndUpdate_2() {
+        
+                // 设置图标按钮上传时状态
+                // $('#code-ble-upload').prop('disabled', true).addClass('grey').html('<i class="fa-solid fa-spinner fa-spin"></i>');
+
+                try {
+                    const firmwareContent = await filePromises();
+                    console.log("Firmware content:", firmwareContent);
+            
+                    console.log(typeof firmwareContent); // 应该输出 'object'
+                    console.log(firmwareContent instanceof ArrayBuffer); // 应该输出 'true'
+                    console.log(firmwareContent.byteLength); // 应该输出 ArrayBuffer 的字节长度
+
+                    // 检查 firmwareContent 是否为有效的 ArrayBuffer
+                    if (firmwareContent instanceof ArrayBuffer) {
+                        updateData = firmwareContent;
+                        console.log("成功更新数据集。");
+                        
+                        // 继续执行更新流程
+                        startUpdateProcess();
+
+                    } else {
+                        console.error('Invalid firmware content received.');
+                        // termSerialBLE.writeln('收到无效的固件内容，检测程序是否编译成功。');
+                    }
+                } catch (error) {
+                    console.error('获取固件失败', error);
+                    // termSerialBLE.writeln('获取固件失败:' + error);
+                }
+            }
+
+
+            function fetchFirmwareAndUpdate() {
+                var firmwareUrl = `./main.espc3.bin`; // 固件文件的URL
+                fetch(firmwareUrl)
+                    .then(response => response.arrayBuffer())
+                    .then(data => {
+                        updateData = data;
+                        startUpdateProcess();
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch firmware', error);
+                    });
+            }
+            
+
+
+            async function startUpdateProcess() {
+                totalSize = updateData.byteLength;
+                currentPosition = 0;
+
+                try {
+                    await sendChunkRecursive(currentPosition);
+                    console.log('Update process completed.');
+                } catch (error) {
+                    console.error('An error occurred during the update process', error);
+                }
+            }
+
+
+            async function sendChunkRecursive(position) {
+                console.log("position",position)
+                console.log("position",totalSize)
+                if (position >= totalSize) {
+                    return;
+                }
+
+                let isLastChunk = position + characteristicSize >= totalSize;
+                let chunkSize = isLastChunk ? totalSize - position : characteristicSize;
+                let chunk = updateData.slice(position, position + chunkSize);
+
+                await sendChunk(chunk);
+
+                position += chunkSize;
+                let progress = ((position / totalSize * 100) + 0.01).toFixed(2);
+                $('#completion').text('Update Progress: ' + progress + '%');
+
+                if (!isLastChunk) {
+                    await sendChunkRecursive(position);
+                }
+            }
+
+            async function sendChunk(chunk) {
+                try {
+                    let characteristic = await esp32Service.getCharacteristic(fileCharacteristicUuid);
+                    await characteristic.writeValue(chunk);
+                } catch (error) {
+                    console.error('Failed to send data', error);
+                    
+                    // 检查是否为DOMException
+                    if (error instanceof DOMException) {
+                        // 例如，你可以尝试重新连接到设备
+                        console.log('Attempting to handle GATT operation failure...');
+
+                        try {
+                            // 断开与设备的连接
+                            await esp32Device.gatt.disconnect();
+                            console.log('Disconnected from the device');
+
+                            // 重新连接到设备
+                            await connectToESP32();
+                            console.log('Reconnected to the device');
+
+                            // 重新获取文件特性
+                            let characteristic = await esp32Service.getCharacteristic(fileCharacteristicUuid);
+
+                            // 再次尝试发送数据
+                            await characteristic.writeValue(chunk);
+
+                            console.log('Data sent successfully after reconnection');
+                        } catch (reconnectError) {
+                            console.error('Reconnection attempt failed', reconnectError);
+                        }
+                    } else {
+                        // 如果不是DOMException，可能是其他错误，可以按需处理
+                    }
+                }
+            }
+
+
+
+            function sendMessageToESP32(message) {
+                if (messageCharacteristic) {
+                    let encoder = new TextEncoder();
+                    let encoded = encoder.encode(message);
+                    messageCharacteristic.writeValue(encoded)
+                        .then(() => {
+                            console.log('Message sent:', message);
+                        })
+                        .catch(error => {
+                            console.error('Send message failed', error);
+                            // reconnectToESP32().then(() => {
+                            //     sendMessageToESP32(message); // 重发消息
+                            // });
+                        });
+                } else {
+                    console.error('Message characteristic not found');
+                    reconnectToESP32(); // 尝试重连
+                }
+            }
+
+            async function filePromises() {
+    
+
+                const form = new FormData();
+                form.append("post_id", "1234");
+                form.append("code_type", "user");
+                form.append("filetype", "filePath");
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0IiwiaXNzIjoiaHR0cHM6Ly93d3cubWFrZXJzbnMuY29tIiwiaWF0IjoxNzA1NjUyODA0LCJuYmYiOjE3MDU2NTI4MDQsImV4cCI6MTcwNTk5ODQwNCwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoxMjM0fX19.52cWJAl5RLotdwc3T1CKCvBR8FV-wzYFvLuv_tkoygU",
+                    }
+                };
+
+                options.body = form;
+
+                const resp = await fetch("https://gp.qutaojiao.com/api/downloadbin.php", options);
+                if (!resp.ok) {
+                    throw new Error(`Downloading firmware`);
+                }
+
+                const blob = await resp.blob();
+
+                // 使用FileReader读取Blob对象的数据
+                return new Promise((resolve, reject) => {
+                    var reader = new FileReader();
+
+                    reader.onload = function () {
+                        // 直接将reader的结果传递给resolve
+                        resolve(this.result);
+                    };
+
+                    // 通过不同方式读取Blob数据
+                    // reader.readAsBinaryString(blob);
+                    reader.readAsText(blob, 'utf8');
+                });
+            }
+
+
+
+        });
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>

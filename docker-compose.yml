@@ -1,0 +1,7 @@
+version: '3'
+services:
+  xiaobai_ai:
+    build:
+      context: .
+    ports:
+      - "8000:8000"

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <script src="./js/jquery-3.6.0.min.js"></script>
+  <script type="module" src="./js/bootstrap/js/bootstrap.bundle.js"></script>
+  <title>模型接口信息</title>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2>模型接口信息</h2>
+  <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal">新增</button>
+  <table class="table">
+    <thead>
+      <tr id="tableHeaders">
+        <!-- 表头将会动态添加到这里 -->
+      </tr>
+    </thead>
+    <tbody id="configList">
+      <!-- 数据将会动态添加到这里 -->
+    </tbody>
+  </table>
+</div>
+
+<!-- 新增模态框 -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel">新增接口配置</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form id="mainForm">
+                <div class="form-group">
+                  <label for="interfaceType">接口名称</label>
+                  <input type="text" class="form-control" id="interfaceName" placeholder="输入接口名称">
+                </div>
+                <div class="form-group">
+                    <label for="interfaceType">接口类型</label>
+                    <select class="form-control" id="interfaceType">
+                      <option value="pandora">潘多拉本地</option>
+                      <option value="openai">OpenAI官方</option>
+                      <option value="gemini">Google Gemini</option>
+                      <option value="zhipu">清华智谱</option>
+                      <option value="zhipuimg">清华智谱图像生成</option>
+                      <option value="xinghuo">讯飞星火V3.1</option>
+                      <option value="superagi">SuperAGI</option>
+                      <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label for="modelName">模型名称</label>
+                  <input type="text" class="form-control" id="modelName" placeholder="输入模型名称">
+                </div>
+                <div class="form-group">
+                  <label for="interfaceAddress">接口地址</label>
+                  <input type="text" class="form-control" id="interfaceAddress" placeholder="输入接口地址">
+                </div>
+                <div class="form-group">
+                  <label for="token">Token</label>
+                  <input type="text" class="form-control" id="token" placeholder="输入Token">
+                </div>
+                
+                <div class="form-group" id="customFields">
+                  <!-- 自定义表单将会动态添加到这里 -->
+                </div>
+                
+                <div class="form-group">
+                  <button type="button" class="btn btn-outline-secondary" id="addCustomFieldBtn">+</button>
+                </div>
+                
+                <!-- <button type="button" class="btn btn-primary" id="submitFormBtn">提交</button> -->
+              </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="submitFormBtn">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- 下拉框选项将会动态添加到这里 -->
+  <!-- <div class="form-group">
+    <label for="interfaceSelector">选择接口</label>
+    <select class="form-control" id="interfaceSelector">
+
+    </select>
+  </div> -->
+
+<!-- Dexie.js 数据库操作 -->
+<script src="./js/dexie.min.js"></script>
+
+<script>
+  // 建立数据库
+  const db = new Dexie("aiSugarDatabase");
+  db.version(1).stores({
+    sessions: '++id, name',
+    config: 'sessionId, savedConfig',
+    gptConfigData: '++id, formData',  // 新增用于存储表单数据的表
+    converseConfig: 'sessionId, converseConfig',
+    conversationHistory: 'sessionId, messagesHistory',
+    sessionContents: 'sessionId, fullContent'
+  });
+
+    // 查询 gptConfigData 表中的特定数据
+    // async function getConfigDataById(id) {
+    //     try {
+    //         const data = await db.gptConfigData.get(id);
+    //         return data;
+    //     } catch (error) {
+    //         console.error('查询数据时出现错误：', error);
+    //         throw error;
+    //     }
+    // }
+
+    // // 示例调用
+    // const exampleId = 1; // 替换为你想查询的 id
+    // getConfigDataById(exampleId)
+    // .then(data => {
+    //     console.log('查询到的数据：', data);
+    // })
+    // .catch(error => {
+    //     console.error('查询数据时出现错误：', error);
+    // });
+
+  // 获取 gptConfigData 表中的所有数据
+  function getConfigData() {
+    return db.gptConfigData.toArray();
+  }
+
+  // 获取表头信息
+  function getTableHeaders(data) {
+    const headers = ["id"]; // 初始表头包含 "id"
+    data.forEach(item => {
+      headers.push(...Object.keys(item.formData));
+    });
+    const uniqueHeaders = [...new Set(headers)]; // 去重
+    return uniqueHeaders;
+  }
+
+  // 创建表头
+  function createTableHeaders(headers) {
+    const tableHeaders = $("#tableHeaders");
+    tableHeaders.empty(); // 清空表头，防止重复添加
+    headers.forEach(header => {
+      tableHeaders.append(`<th>${header}</th>`);
+    });
+    tableHeaders.append(`<th>操作</th>`); // 新增一列用于操作
+  }
+
+  // 读取并展示 gptConfigData 表数据
+  function showConfigData() {
+    getConfigData().then(data => {
+      const headers = getTableHeaders(data);
+      createTableHeaders(headers);
+
+      const configList = $("#configList");
+      configList.empty();
+
+      data.forEach(item => {
+        const rowData = Object.assign({ id: item.id }, item.formData);
+        const rowHtml = `<tr>${headers.map(header => `<td>${rowData[header]?.value || rowData[header]}</td>`).join("")}<td><button class="btn btn-danger btn-sm" onclick="confirmDelete(${item.id})">删除</button></td></tr>`;
+        configList.append(rowHtml);
+      });
+    }).catch(error => {
+      console.error('读取数据时出现错误：', error);
+    });
+  }
+
+  // 页面加载完成后，显示 gptConfigData 表数据
+  $(document).ready(() => {
+    showConfigData();
+  });
+
+  // 确认删除
+  function confirmDelete(id) {
+    if (confirm("确认删除这条数据吗？")) {
+      deleteConfigData(id);
+    }
+  }
+
+    // 删除 gptConfigData 表中的特定数据
+    function deleteConfigData(id) {
+    db.gptConfigData.delete(id)
+      .then(() => {
+        console.log(`成功删除 id 为 ${id} 的数据`);
+        showConfigData(); // 删除后重新刷新表格
+      })
+      .catch(error => {
+        console.error(`删除 id 为 ${id} 的数据时出现错误：`, error);
+      });
+  }
+
+   // 使用 on('click') 替代 onclick
+   $('#addCustomFieldBtn').on('click', function () {
+      addCustomField();
+    });
+
+    $('#submitFormBtn').on('click', function () {
+      submitForm();
+    });
+
+
+
+//   新增数据的操作
+// 通用数据插入数据库函数
+function insertFormData(formData) {
+  db.gptConfigData.add({ formData: formData }).then(id => {
+    console.log('表单数据已成功插入数据库，生成的主键（sessionId）为:', id);
+    $("#addModal").modal("hide");
+    showConfigData(); // 新增后重新刷新表格
+  }).catch(error => {
+    console.error('插入数据时出现错误：', error);
+  });
+}
+
+  function addCustomField() {
+    // 获取表单名称、表单字段、表单值
+    var fieldName = prompt("输入表单名称:");
+    var fieldKey = prompt("输入表单字段:");
+    var fieldValue = prompt("输入表单值:");
+    
+    // 创建新的自定义表单组
+    var customFormGroup = $('<div class="form-group"></div>');
+    
+    // 创建标签元素并设置内容
+    var label = $('<label class="col-form-label">' + fieldName + '</label>');
+    
+    // 创建表单行元素
+    var formRow = $('<div class="form-row"></div>');
+    
+    // 创建输入框元素并设置属性,需要表单提示
+    var keyInput = $('<input type="text" class="form-control col-sm-3" value="' + fieldKey + '" placeholder="字段,纯英文">');
+    var valueInput = $('<input type="text" class="form-control col-sm" value="' + fieldValue + '" placeholder="字段值">');
+    
+    // 创建删除按钮
+    var delButton = $('<button type="button" class="btn btn-outline-secondary" onclick="delCustomField(this)">-</button>');
+    
+    // 将输入框和删除按钮添加到表单行元素中
+    formRow.append(keyInput);
+    formRow.append(valueInput);
+    formRow.append(delButton);
+    
+    // 将标签和表单行添加到自定义表单组中
+    customFormGroup.append(label);
+    customFormGroup.append(formRow);
+    
+    // 获取自定义表单容器
+    var customFieldsContainer = $('#customFields');
+    
+    // 将新的自定义表单组插入到自定义表单容器中
+    customFieldsContainer.append(customFormGroup);
+  }
+
+  function delCustomField(button) {
+    // 获取要删除的自定义表单组
+    var customFormGroup = $(button).closest('.form-group');
+    
+    // 删除自定义表单组
+    customFormGroup.remove();
+  }
+
+  // 修改submitForm函数，添加插入数据库的操作
+// 修改 submitForm 函数
+function submitForm() {
+  // 获取所有表单字段和值
+  var formData = {};
+
+  // 处理默认表单字段
+  $('#mainForm .form-group').each(function () {
+    var labelName = $(this).find('label').text();
+    var inputId = $(this).find(':input').attr('id');
+    var inputValue = $(this).find(':input').val();
+
+    // 排除空 labelName
+    if (labelName.trim() !== "") {
+      formData[labelName] = {
+        "inputId": inputId,
+        "key": inputId,
+        "value": inputValue
+      };
+    }
+  });
+
+  // 处理自定义表单字段
+  $('#customFields .form-group').each(function (index) {
+    var fieldName = $(this).find('.col-form-label').text();
+    var fieldKey = $(this).find('.col-sm-3').val();
+    var fieldValue = $(this).find('.col-sm').val();
+
+    formData[fieldName] = {
+      "inputId": fieldKey,
+      "key": fieldKey,
+      "value": fieldValue
+    };
+  });
+
+  // 将 JSON 数据打印在控制台
+  console.log(JSON.stringify(formData, null, 2));
+
+  // 插入数据库
+  insertFormData(formData);
+}
+
+
+
+
+
+// 查询 gptConfigData 表中的所有数据
+function getConfigDataSel() {
+    return db.gptConfigData.toArray();
+  }
+
+  // 在下拉框中显示接口名称和对应的id
+  function showInterfaceSelector(data) {
+    const interfaceSelector = $("#interfaceSelector");
+    interfaceSelector.empty(); // 清空下拉框选项，防止重复添加
+
+    data.forEach(item => {
+      interfaceSelector.append(`<option value="${item.id}">${item.formData["接口名称"]?.value || item.formData["接口名称"]}</option>`);
+    });
+  }
+
+  // 读取并展示 gptConfigData 表数据到下拉框
+  function showConfigDataSel() {
+    getConfigDataSel().then(data => {
+      showInterfaceSelector(data);
+    }).catch(error => {
+      console.error('读取数据时出现错误：', error);
+    });
+  }
+
+  // 页面加载完成后，显示 gptConfigData 表数据
+  $(document).ready(() => {
+    showConfigDataSel();
+  });
+
+</script>
+
+</body>
+</html>

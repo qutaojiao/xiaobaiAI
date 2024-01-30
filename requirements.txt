@@ -1,0 +1,26 @@
+fastapi==0.109.0
+uvicorn==0.25.0
+transformers==4.36.2
+torch==2.1.2
+PyPDF2==3.0.1
+python-docx==1.1.0
+python-pptx==0.6.23
+Markdown==3.5.2
+numpy==1.26.3
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+python-multipart==0.0.6
+zhipuai==2.0.1
+websocket==0.2.1
+hugchat==0.3.10
+
+# gptfunc.py
+Flask==3.0.0
+beautifulsoup4==4.12.2
+requestium==0.3.0
+tiktoken==0.5.2
+# selenium==4.16.0
+pyppeteer==1.0.2
+
+
+# 启动方式uvicorn app:app --reload --port 8001
