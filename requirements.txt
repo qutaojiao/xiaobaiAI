@@ -23,4 +23,4 @@ tiktoken==0.5.2
 pyppeteer==1.0.2
 
 
-# 启动方式uvicorn app:app --reload --port 8000
+# 启动方式uvicorn app:app --reload --port 8001
