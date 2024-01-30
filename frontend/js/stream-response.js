@@ -1125,7 +1125,7 @@ $(document).ready(async function () {
 
 
   // 星火大模型
-  let requestObj = {
+  var requestObj = {
     APPID: 'xxx',
     APISecret: 'xxxx',
     APIKey: 'xxxxx',
@@ -1143,13 +1143,6 @@ $(document).ready(async function () {
 
   const xinghuoGpt = async () => {
 
-    requestObj = {
-      APPID: '33fafcb3',
-      APISecret: 'MWRjN2Y2ZTI1ZTU2NGRkZjU5MWYzMDRk',
-      APIKey: '581688d8136cb60418502f065ff0facd',
-      Uid: "MakerSNS_AI",
-      sparkResult: ''
-    }
 
     let myUrl = await getWebsocketUrl();
     // let inputVal = promptInput.value;
